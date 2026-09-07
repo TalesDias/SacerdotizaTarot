@@ -11,7 +11,7 @@ interface Props {
 const { reading, peek } = Astro.props;
 ---
 
-<article class="card">
+<article class="card" tabindex="0">
   {peek && <Image src={peek} alt="" class="peek" widths={[62, 124, 186]} sizes="62px" loading="lazy" aria-hidden="true" />}
 
   <div class="head">
@@ -57,6 +57,11 @@ const { reading, peek } = Astro.props;
        longest word — without wrapping, the pill escapes the card on narrow
        columns (e.g. "Decifrando o Parceiro" in a 4-up grid at 1400px). */
     flex-wrap: wrap;
+    /* Wrapping costs 37px, so a long title made its card taller than its
+       siblings. Reserve the wrapped height for every card — title line (23px
+       x 1.2) + gap + tag (23px + 4px offset) — so the tag still sits inline
+       where it fits, but the group stays level either way. */
+    min-height: 65px;
   }
 
   h4 {
@@ -156,44 +161,60 @@ const { reading, peek } = Astro.props;
     color: var(--base);
   }
 
-  /* On touch devices the card stays open: every description and price is
-     visible with no interaction, and the decorative peek is suppressed.
-     Only pointer devices get the collapse-and-reveal from the canvas. */
-  @media (hover: hover) {
-    .body {
-      grid-template-rows: minmax(0, 0fr);
-      opacity: 0;
-    }
+  /*
+   * Collapsed everywhere, not just on pointer devices. Hover opens it on
+   * desktop; :focus-within covers both keyboard (the Agendar link inside is
+   * focusable) and touch, where a tap focuses the card itself via tabindex.
+   */
+  .body {
+    grid-template-rows: minmax(0, 0fr);
+    opacity: 0;
+  }
 
-    .card:hover,
-    .card:focus-within {
-      background: color-mix(in oklab, var(--accent) 20%, #fff);
-      border-color: var(--accent);
-      box-shadow: var(--shadow-lg);
-      transform: translateY(-5px);
-      /* The canvas opened on a 220 ms timer; as a delay it applies on the way
-         in only, so leaving still closes immediately. */
-      transition-delay: 220ms;
-    }
+  .card:hover,
+  .card:focus-within {
+    background: color-mix(in oklab, var(--accent) 20%, #fff);
+    border-color: var(--accent);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-5px);
+    /* The canvas opened on a 220 ms timer; as a delay it applies on the way
+       in only, so leaving still closes immediately. */
+    transition-delay: 220ms;
+  }
 
-    .card:hover .body,
-    .card:focus-within .body {
-      grid-template-rows: minmax(0, 1fr);
-      opacity: 1;
-      transition-delay: 220ms;
-    }
+  .card:hover .body,
+  .card:focus-within .body {
+    grid-template-rows: minmax(0, 1fr);
+    opacity: 1;
+    transition-delay: 220ms;
+  }
 
-    .card:hover .tag,
-    .card:focus-within .tag {
-      opacity: 0;
-      transition-delay: 220ms;
-    }
+  .card:hover .tag,
+  .card:focus-within .tag {
+    opacity: 0;
+    transition-delay: 220ms;
+  }
 
-    .card:hover .peek,
-    .card:focus-within .peek {
-      opacity: 1;
-      transform: translateY(-46px) rotate(5deg);
-      transition-delay: 220ms;
+  .card:hover .peek,
+  .card:focus-within .peek {
+    opacity: 1;
+    transform: translateY(-46px) rotate(5deg);
+    transition-delay: 220ms;
+  }
+
+  /* Where there is no hover the card is tapped, so it should look tappable.
+     iOS also needs a pointer cursor before it treats a non-form element as
+     tappable, which is what makes the tap focus it. */
+  @media (hover: none) {
+    .card {
+      cursor: pointer;
     }
   }
+
+  /* The whole card is the hit target, so it gets the focus ring, not a subrect. */
+  .card:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 3px;
+  }
+
 </style>

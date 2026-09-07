@@ -22,7 +22,7 @@ import CardIcon from './icons/CardIcon.astro';
             </span>
           </summary>
           <div class="answer">
-            <p>{f.a}</p>
+            {f.a.split('\n\n').map((para) => <p>{para}</p>)}
             {f.pay && (
               <div class="pay">
                 <span class="method">

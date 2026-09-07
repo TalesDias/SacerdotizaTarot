@@ -144,7 +144,7 @@ export function buildGraph({ siteUrl, portraitUrl }: Options) {
         mainEntity: FAQS.map((f) => ({
           '@type': 'Question',
           name: f.q,
-          acceptedAnswer: { '@type': 'Answer', text: f.a },
+          acceptedAnswer: { '@type': 'Answer', text: f.a.replace(/\s*\n+\s*/g, ' ') },
         })),
       },
     ],
