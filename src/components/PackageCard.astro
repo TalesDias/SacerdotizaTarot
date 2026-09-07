@@ -1,27 +1,18 @@
 ---
 import type { Package } from '../data/content';
-import BeadsIcon from './icons/BeadsIcon.astro';
-import DeckIcon from './icons/DeckIcon.astro';
-import BallIcon from './icons/BallIcon.astro';
-import ChaliceIcon from './icons/ChaliceIcon.astro';
-import MoonIcon from './icons/MoonIcon.astro';
+import RosesIcon from './icons/RosesIcon.astro';
 
 interface Props {
   pkg: Package;
 }
 const { pkg } = Astro.props;
-
-const ICONS = { deck: DeckIcon, ball: BallIcon, chalice: ChaliceIcon, moon: MoonIcon };
-const Icon = ICONS[pkg.icon];
 ---
 
 <article class="pkg" style={`--accent:${pkg.accent};--bullet:${pkg.bullet}`}>
-  <BeadsIcon />
+  <RosesIcon />
   <span class="topbar"></span>
 
   <div class="content">
-    <div class="icon"><Icon /></div>
-
     {
       pkg.badge ? (
         <div class="titlerow">
@@ -81,13 +72,10 @@ const Icon = ICONS[pkg.icon];
   .content {
     position: relative;
     z-index: 1;
-    padding: 22px 20px 0;
-  }
-
-  .icon {
-    display: flex;
-    justify-content: center;
-    margin: 2px 0 16px;
+    /* The garland is 18% of the card's width tall (viewBox 300x54) and offset
+       6px, so the clearance has to scale with the card too — percentage padding
+       resolves against the card width, giving a steady ~11px gap at every size. */
+    padding: calc(16px + 18.5%) 20px 0;
   }
 
   h3 {
@@ -100,7 +88,6 @@ const Icon = ICONS[pkg.icon];
 
   h3.solo {
     margin-bottom: 18px;
-    padding-right: 28px;
   }
 
   .titlerow {
@@ -108,7 +95,6 @@ const Icon = ICONS[pkg.icon];
     align-items: center;
     gap: 10px;
     margin: 0 0 12px;
-    padding-right: 28px;
     flex-wrap: wrap;
   }
 

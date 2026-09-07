@@ -211,15 +211,12 @@ export const TIME_TIERS: Tier[] = [
   },
 ];
 
-export type PackageIcon = 'deck' | 'ball' | 'chalice' | 'moon';
-
 export interface Package {
   name: string;
   /** Top bar and heading accent. */
   accent: string;
   /** Bullet colour — darker than `accent` where the accent is too light on white. */
   bullet: string;
-  icon: PackageIcon;
   items?: string[];
   description?: string;
   badge?: string;
@@ -237,7 +234,6 @@ export const PACKAGES: Package[] = [
     name: 'Pacote do amor para solteiros',
     accent: '#c79ae8',
     bullet: '#c79ae8',
-    icon: 'deck',
     items: ['Torre do Amor', 'Destino amoroso', '5 perguntas', 'Conselho'],
     price: 130,
     priceLabel: 'R$ 130',
@@ -247,7 +243,6 @@ export const PACKAGES: Package[] = [
     name: 'Pacote do amor para relacionamentos',
     accent: '#ed8f89',
     bullet: '#ed8f89',
-    icon: 'deck',
     items: ['O Jogo da Perspectiva', 'Decifrando o Parceiro', '5 perguntas', 'Conselho'],
     price: 130,
     priceLabel: 'R$ 130',
@@ -257,7 +252,6 @@ export const PACKAGES: Package[] = [
     name: 'Pacote do essencial',
     accent: '#f2c94c',
     bullet: '#d9a91f',
-    icon: 'ball',
     items: ['Vidas Passadas', 'Mandala Astrológica', '5 perguntas', 'Conselho espiritual'],
     price: 180,
     priceLabel: 'R$ 180',
@@ -267,7 +261,6 @@ export const PACKAGES: Package[] = [
     name: 'Pacote da vida profissional',
     accent: '#7fc9cd',
     bullet: '#4fa4a8',
-    icon: 'chalice',
     items: ['5 perguntas', 'Análise do meio profissional', 'Análise sobre abertura de caminhos'],
     price: 65,
     priceLabel: 'R$ 65',
@@ -277,7 +270,6 @@ export const PACKAGES: Package[] = [
     name: 'Pacote mensal',
     accent: '#8ed07a',
     bullet: '#8ed07a',
-    icon: 'moon',
     badge: 'assinatura',
     description:
       'Todo início de mês (no dia combinado) te enviarei uma análise de 4/5 áreas de sua vida (a sua escolha) + um conselho.',
