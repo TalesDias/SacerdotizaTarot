@@ -4,12 +4,22 @@ import SpreadCard from './SpreadCard.astro';
 import CardBackIcon from './icons/CardBackIcon.astro';
 
 /**
- * The decorative card backs. Globbed rather than imported by name so the build
- * succeeds with the folder empty and picks the art up automatically once the
- * eight split_*.png files are dropped in.
+ * The Major Arcana peeks. Globbed rather than imported by name, so the build
+ * still succeeds if the folder is empty and new cards are picked up on sight.
+ * Filenames carry the deck number (00-fool … 21-world), so sorting by name
+ * walks the Major Arcana in order rather than alphabetically.
  */
 const modules = import.meta.glob<{ default: ImageMetadata }>(
-  '../assets/tarot/*.{png,jpg,jpeg,webp,avif}',
+  [
+    '../assets/tarot/Major_Arcana_webp/*.webp',
+    // Held back from the decorative rotation: beside a price and a booking
+    // button this imagery reads as ominous, whatever it means in a reading.
+    // Excluded at the glob so they are never bundled, not just skipped.
+    '!../assets/tarot/Major_Arcana_webp/12-hanged-man.webp',
+    '!../assets/tarot/Major_Arcana_webp/13-death.webp',
+    '!../assets/tarot/Major_Arcana_webp/15-devil.webp',
+    '!../assets/tarot/Major_Arcana_webp/16-tower.webp',
+  ],
   { eager: true },
 );
 const peeks = Object.keys(modules)

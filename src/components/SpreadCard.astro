@@ -12,7 +12,7 @@ const { reading, peek } = Astro.props;
 ---
 
 <article class="card">
-  {peek && <Image src={peek} alt="" class="peek" widths={[62, 124]} loading="lazy" aria-hidden="true" />}
+  {peek && <Image src={peek} alt="" class="peek" widths={[62, 124, 186]} sizes="62px" loading="lazy" aria-hidden="true" />}
 
   <div class="head">
     <h4>{reading.title}</h4>

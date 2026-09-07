@@ -61,14 +61,16 @@ CSS, the FAQ is native `<details name="faq">`, and the only script is ~15 inline
 lines driving the promo `<dialog>`. Every price, description and FAQ answer is in
 the served HTML, so it is all indexable with scripting off.
 
-## The missing artwork
+## Card art
 
-`src/assets/tarot/` is empty. The design references eight card-back images
-(`split_0_0.png` … `split_1_3.png`) that could not be pulled from the Claude Design
-project — each exceeds the 256 KiB per-file cap of the read API and comes back
-truncated.
+`src/assets/tarot/Major_Arcana_webp/` holds the 22 Rider-Waite-Smith Major Arcana.
+One peeks above each reading on hover, assigned in deck order.
 
-They are decorative: a small card peeks above each reading on hover. The site builds
-and looks correct without them. Drop the eight files into `src/assets/tarot/` and
-they are picked up automatically — the component globs the folder, so no code change
-is needed. Any order works; they are assigned round-robin.
+Four cards — Hanged Man, Death, Devil, Tower — are excluded at the glob in
+`Spreads.astro`, so they are never bundled: that imagery reads as ominous beside a
+price and a booking button. That leaves 18 cards for 14 readings, so each reading
+gets a distinct one. See `src/assets/tarot/README.md`.
+
+The full deck scan is kept at `reference/Rider-Waite-Smith Tarot Deck small.pdf`.
+The source PNGs (42 MB) were converted to webp (1.9 MB) and dropped; the
+conversion recipe is in that same README.
