@@ -76,6 +76,11 @@ const groups = READING_GROUPS.map((g) => ({
     margin-bottom: 48px;
   }
 
+  /* The section's own padding closes out the last group. */
+  .group:last-child {
+    margin-bottom: 0;
+  }
+
   .group-head {
     display: flex;
     align-items: center;
