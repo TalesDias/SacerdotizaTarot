@@ -1,0 +1,60 @@
+---
+import { Font } from 'astro:assets';
+import '../styles/globals.css';
+import { SEO_TITLE, SEO_DESCRIPTION, SITE_NAME } from '../data/site';
+import { buildGraph } from '../data/schema';
+
+interface Props {
+  /** Built URL of the portrait, used as the Organization/Person image. */
+  portraitUrl: string;
+}
+const { portraitUrl } = Astro.props;
+
+const site = Astro.site!;
+const canonical = new URL(Astro.url.pathname, site).href;
+const ogImage = new URL('/og.png', site).href;
+const graph = buildGraph({ siteUrl: site.origin, portraitUrl: new URL(portraitUrl, site).href });
+---
+
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>{SEO_TITLE}</title>
+    <meta name="description" content={SEO_DESCRIPTION} />
+    <link rel="canonical" href={canonical} />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="author" content={SITE_NAME} />
+    <meta name="theme-color" content="#faf6ee" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:title" content={SEO_TITLE} />
+    <meta property="og:description" content={SEO_DESCRIPTION} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={SEO_TITLE} />
+    <meta name="twitter:description" content={SEO_DESCRIPTION} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <Font cssVariable="--font-serif" preload />
+    <Font cssVariable="--font-sans" preload />
+
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(graph)} />
+  </head>
+
+  <body>
+    <a class="skip-link" href="#jogos">Ir para o conteúdo</a>
+    <slot />
+  </body>
+</html>

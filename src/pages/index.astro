@@ -1,0 +1,67 @@
+---
+import { getImage } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Backdrop from '../components/Backdrop.astro';
+import Hero from '../components/Hero.astro';
+import Spreads from '../components/Spreads.astro';
+import Divider from '../components/Divider.astro';
+import Questions from '../components/Questions.astro';
+import Packages from '../components/Packages.astro';
+import Faq from '../components/Faq.astro';
+import PromoDialog from '../components/PromoDialog.astro';
+import portrait from '../assets/yara.webp';
+import { SITE_NAME, INSTAGRAM_HANDLE, INSTAGRAM_URL } from '../data/site';
+
+// Resolved build path, so the structured data points at a real image.
+const portraitImg = await getImage({ src: portrait, format: 'webp', width: 520 });
+---
+
+<Base portraitUrl={portraitImg.src}>
+  <div class="page">
+    <Backdrop />
+    <Hero />
+
+    <main>
+      <Spreads />
+      <Divider />
+      <Questions />
+      <Divider />
+      <Packages />
+      <Divider />
+      <Faq />
+    </main>
+
+    <footer>
+      {SITE_NAME} · <a href={INSTAGRAM_URL} target="_blank" rel="noopener">{INSTAGRAM_HANDLE}</a>
+    </footer>
+  </div>
+
+  <PromoDialog />
+</Base>
+
+<style>
+  .page {
+    position: relative;
+    max-width: 100%;
+    overflow-x: hidden;
+    background: var(--base);
+  }
+
+  main {
+    position: relative;
+    z-index: 1;
+  }
+
+  footer {
+    position: relative;
+    z-index: 1;
+    margin-top: 72px;
+    padding: 0 24px 96px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--clay);
+  }
+</style>

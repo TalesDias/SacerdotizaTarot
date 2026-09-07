@@ -1,0 +1,182 @@
+---
+import { Picture } from 'astro:assets';
+import portrait from '../assets/yara.webp';
+import { BIO } from '../data/content';
+import { SITE_NAME, TAGLINE, TAROLOGA, INSTAGRAM_URL, waLink } from '../data/site';
+---
+
+<header class="hero">
+  <div class="titles">
+    <h1>{SITE_NAME}</h1>
+    <p class="tagline">{TAGLINE}</p>
+  </div>
+
+  <div class="intro">
+    <div class="portrait-ring">
+      <Picture
+        src={portrait}
+        alt={`${TAROLOGA}, taróloga e mestre de baralho cigano`}
+        widths={[260, 520, 780]}
+        sizes="min(260px, 58vw)"
+        formats={['avif']}
+        fallbackFormat="webp"
+        loading="eager"
+        fetchpriority="high"
+        class="portrait"
+      />
+    </div>
+    <p class="bio">{BIO}</p>
+  </div>
+
+  <div class="actions">
+    <a class="btn btn-solid" href={waLink()} target="_blank" rel="noopener">
+      <span class="pip" style="background:var(--accent-2)"></span>WhatsApp
+    </a>
+    <a class="btn btn-ghost" href={INSTAGRAM_URL} target="_blank" rel="noopener">
+      <span class="pip" style="background:var(--accent-1)"></span>Instagram
+    </a>
+  </div>
+
+  <a class="scroll-cue" href="#jogos">
+    <span>Conheça os Jogos</span>
+    <span class="arrow" aria-hidden="true">↓</span>
+  </a>
+</header>
+
+<style>
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  .titles {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(46px, 8.6vw, 118px);
+    line-height: 0.98;
+    text-align: center;
+    letter-spacing: -0.01em;
+    color: var(--clay);
+    text-wrap: balance;
+  }
+
+  .tagline {
+    margin: 0;
+    font-size: clamp(12px, 1.6vw, 14px);
+    font-weight: 700;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    text-align: center;
+    color: var(--clay);
+  }
+
+  .intro {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(24px, 4vw, 48px);
+    max-width: 900px;
+  }
+
+  .portrait-ring {
+    flex: 0 0 auto;
+    padding: 12px;
+    border-radius: 50%;
+    background: var(--surface);
+    box-shadow: 0 14px 40px rgba(123, 106, 94, 0.14);
+  }
+
+  .portrait {
+    width: min(260px, 58vw);
+    height: min(260px, 58vw);
+    display: block;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .bio {
+    flex: 1 1 320px;
+    min-width: 280px;
+    max-width: 530px;
+    margin: 0;
+    text-align: justify;
+    font-size: 17px;
+    line-height: 1.75;
+    color: var(--body);
+    text-wrap: pretty;
+  }
+
+  .actions {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    justify-content: center;
+  }
+
+  .actions .btn {
+    padding: 13px 26px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: none;
+  }
+
+  .pip {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .scroll-cue {
+    position: relative;
+    margin-top: auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 32px 0 28px;
+    /* Canvas used #b08d86 — 2.80:1 on the cream ground, below the AA floor. */
+    color: var(--clay);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+  }
+
+  .scroll-cue:hover {
+    color: var(--ink);
+  }
+
+  /* Justified text on a ~340px column opens rivers of whitespace; the canvas
+     only ever rendered this at desktop width. */
+  @media (max-width: 559px) {
+    .bio {
+      text-align: left;
+    }
+  }
+
+  .arrow {
+    font-size: 16px;
+    letter-spacing: normal;
+    animation: sdrift 2.4s ease-in-out infinite;
+  }
+</style>

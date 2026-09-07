@@ -1,0 +1,113 @@
+---
+import { READING_GROUPS } from '../data/content';
+import SpreadCard from './SpreadCard.astro';
+import CardBackIcon from './icons/CardBackIcon.astro';
+
+/**
+ * The decorative card backs. Globbed rather than imported by name so the build
+ * succeeds with the folder empty and picks the art up automatically once the
+ * eight split_*.png files are dropped in.
+ */
+const modules = import.meta.glob<{ default: ImageMetadata }>(
+  '../assets/tarot/*.{png,jpg,jpeg,webp,avif}',
+  { eager: true },
+);
+const peeks = Object.keys(modules)
+  .sort()
+  .map((k) => modules[k]!.default);
+
+// Flat index across all groups, matching the canvas's TAROT[idx % len].
+let cursor = 0;
+const groups = READING_GROUPS.map((g) => ({
+  ...g,
+  readings: g.readings.map((r) => ({
+    reading: r,
+    peek: peeks.length ? peeks[cursor++ % peeks.length] : undefined,
+  })),
+}));
+---
+
+<section id="jogos" class="section">
+  <div class="section-head">
+    <h2>Tiragens Prontas</h2>
+    <span class="rule" style="background:var(--accent-4)"></span>
+  </div>
+
+  {
+    groups.map((group) => (
+      <div class="group" style={`--accent:${group.accent}`}>
+        <div class="group-head">
+          <CardBackIcon />
+          <h3>{group.name}</h3>
+          <span class="group-rule"></span>
+        </div>
+        <p class="note">{group.note}</p>
+        <div class="grid">
+          {group.readings.map((r) => (
+            <SpreadCard reading={r.reading} peek={r.peek} />
+          ))}
+        </div>
+      </div>
+    ))
+  }
+</section>
+
+<style>
+  .section-head {
+    margin-bottom: 44px;
+    gap: 10px;
+  }
+
+  .section-head h2 {
+    font-size: clamp(36px, 5.4vw, 62px);
+  }
+
+  .group {
+    margin-bottom: 48px;
+  }
+
+  .group-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 8px;
+  }
+
+  .group-head h3 {
+    margin: 0;
+    font-size: 34px;
+    color: var(--clay);
+  }
+
+  .group-rule {
+    flex: 1;
+    height: 6px;
+    background: var(--accent);
+  }
+
+  .note {
+    margin: 0 0 22px;
+    font-size: 14px;
+    font-weight: 600;
+    /* Canvas used #a1907f — 2.87:1 on the cream ground, below the AA floor. */
+    color: var(--clay);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 18px;
+    align-items: start;
+  }
+
+  /* The canvas switched to a single column below 760px via a resize listener. */
+  @media (max-width: 759px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+
+    .group-head h3 {
+      font-size: 27px;
+    }
+  }
+</style>

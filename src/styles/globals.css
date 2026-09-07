@@ -1,0 +1,238 @@
+/* ---------------------------------------------------------------
+   Design tokens — the canvas's fixed palette.
+   --------------------------------------------------------------- */
+:root {
+  --base: #faf6ee;
+  --surface: #fff;
+  --ink: #4a3f38;
+  --clay: #7b6a5e;
+  --body: #6c5f56;
+  --rule: #eed3ce;
+  --border: #e0bfb8;
+
+  /* Decorative only. On --base this measures 2.87:1, so it must never carry
+     small text; use --clay (4.79:1) for anything readable. */
+  --muted: #a1907f;
+
+  --accent-1: #f4a3b4;
+  --accent-2: #93d2d4;
+  --accent-3: #cfc0ee;
+  --accent-4: #e3d9a8;
+
+  --shadow-sm: 0 6px 18px rgba(123, 106, 94, 0.06);
+  --shadow-md: 0 8px 24px rgba(123, 106, 94, 0.08);
+  --shadow-lg: 0 18px 40px rgba(123, 106, 94, 0.16);
+
+  --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+
+  color-scheme: light;
+}
+
+/* ---------------------------------------------------------------
+   Reset / base
+   --------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--base);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+a {
+  color: var(--clay);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--ink);
+}
+
+img,
+svg {
+  max-width: 100%;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+}
+
+/* Visible only on keyboard focus — the page has no nav, so this is the one
+   way past the hero for screen-reader and keyboard users. */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  padding: 12px 20px;
+  background: var(--clay);
+  color: var(--base);
+  border-radius: 0 0 10px 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.skip-link:focus {
+  left: 0;
+}
+
+:focus-visible {
+  outline: 3px solid var(--clay);
+  outline-offset: 3px;
+}
+
+/* ---------------------------------------------------------------
+   Animations
+   --------------------------------------------------------------- */
+@keyframes sdrift {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translateY(7px);
+    opacity: 1;
+  }
+}
+
+@keyframes sfloatA {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+  50% {
+    transform: translate3d(2.5%, -3%, 0) rotate(9deg) scale(1.07);
+  }
+}
+
+@keyframes sfloatB {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+  50% {
+    transform: translate3d(-3%, 3.5%, 0) rotate(-8deg) scale(1.05);
+  }
+}
+
+@keyframes spromo {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---------------------------------------------------------------
+   Shared primitives
+   --------------------------------------------------------------- */
+.section {
+  position: relative;
+  z-index: 1;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 56px 24px 20px;
+}
+
+.section-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.section-head h2 {
+  margin: 0;
+  font-size: clamp(34px, 5vw, 58px);
+  color: var(--clay);
+}
+
+.rule {
+  width: 120px;
+  height: 8px;
+}
+
+/* Pill buttons — solid (primary) and outlined (secondary). */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 28px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: background 0.25s, color 0.25s, border-color 0.25s;
+}
+
+.btn-solid {
+  background: var(--clay);
+  color: var(--base);
+}
+
+.btn-solid:hover {
+  background: var(--ink);
+  color: var(--base);
+}
+
+.btn-ghost {
+  border: 1.5px solid var(--border);
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--clay);
+}
+
+.btn-ghost:hover {
+  background: #fff;
+  border-color: var(--clay);
+  color: var(--ink);
+}
+
+.cta-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+}
+
+/* Lets `block-size: auto` animate, so <details> can open with a height
+   transition. Ignored by browsers that don't support it — they open instantly. */
+@supports (interpolate-size: allow-keywords) {
+  :root {
+    interpolate-size: allow-keywords;
+  }
+}

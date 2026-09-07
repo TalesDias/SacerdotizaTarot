@@ -1,0 +1,188 @@
+---
+import type { Package } from '../data/content';
+import BeadsIcon from './icons/BeadsIcon.astro';
+import DeckIcon from './icons/DeckIcon.astro';
+import BallIcon from './icons/BallIcon.astro';
+import ChaliceIcon from './icons/ChaliceIcon.astro';
+import MoonIcon from './icons/MoonIcon.astro';
+
+interface Props {
+  pkg: Package;
+}
+const { pkg } = Astro.props;
+
+const ICONS = { deck: DeckIcon, ball: BallIcon, chalice: ChaliceIcon, moon: MoonIcon };
+const Icon = ICONS[pkg.icon];
+---
+
+<article class="pkg" style={`--accent:${pkg.accent};--bullet:${pkg.bullet}`}>
+  <BeadsIcon />
+  <span class="topbar"></span>
+
+  <div class="content">
+    <div class="icon"><Icon /></div>
+
+    {
+      pkg.badge ? (
+        <div class="titlerow">
+          <h3>{pkg.name}</h3>
+          <span class="badge">{pkg.badge}</span>
+        </div>
+      ) : (
+        <h3 class="solo">{pkg.name}</h3>
+      )
+    }
+
+    {
+      pkg.items && (
+        <ul>
+          {pkg.items.map((item) => (
+            <li>
+              <span class="bullet" aria-hidden="true">
+                •
+              </span>
+              {item}
+            </li>
+          ))}
+        </ul>
+      )
+    }
+
+    {pkg.description && <p class="desc">{pkg.description}</p>}
+  </div>
+
+  <div class="pricing">
+    <div class="priceline">
+      <span class="price">{pkg.priceLabel}</span>
+      <span class="suffix">{pkg.priceSuffix}</span>
+    </div>
+    {pkg.footnote && <p class="footnote">{pkg.footnote}</p>}
+  </div>
+</article>
+
+<style>
+  .pkg {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 0 0 28px;
+    background: var(--surface);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+  }
+
+  .topbar {
+    height: 8px;
+    background: var(--accent);
+  }
+
+  .content {
+    position: relative;
+    z-index: 1;
+    padding: 22px 20px 0;
+  }
+
+  .icon {
+    display: flex;
+    justify-content: center;
+    margin: 2px 0 16px;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.3;
+    overflow-wrap: break-word;
+    color: var(--ink);
+  }
+
+  h3.solo {
+    margin-bottom: 18px;
+    padding-right: 28px;
+  }
+
+  .titlerow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 12px;
+    padding-right: 28px;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    flex: 0 0 auto;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink);
+    background: color-mix(in oklab, var(--accent) 25%, #fff);
+    border-radius: 999px;
+    padding: 4px 10px;
+  }
+
+  ul {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    display: flex;
+    gap: 10px;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--body);
+  }
+
+  .bullet {
+    color: var(--bullet);
+    font-weight: 700;
+  }
+
+  .desc {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--body);
+  }
+
+  .pricing {
+    margin-top: auto;
+    padding: 20px 20px 0;
+  }
+
+  .priceline {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+
+  .price {
+    font-family: var(--font-serif);
+    font-size: 38px;
+    line-height: 1;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+
+  .suffix {
+    font-size: 14px;
+    /* Canvas used #a1907f — below the AA contrast floor at this size. */
+    color: var(--clay);
+    white-space: nowrap;
+  }
+
+  .footnote {
+    margin: 8px 0 0;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--clay);
+  }
+</style>

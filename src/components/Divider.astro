@@ -1,0 +1,35 @@
+---
+/** Rule–dot–dot–dot–rule separator, used three times down the page. */
+---
+<div class="divider" aria-hidden="true">
+  <span class="line"></span>
+  <span class="dot" style="background:var(--accent-1)"></span>
+  <span class="dot" style="background:var(--accent-2)"></span>
+  <span class="dot" style="background:var(--accent-3)"></span>
+  <span class="line"></span>
+</div>
+
+<style>
+  .divider {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    max-width: 520px;
+    margin: 56px auto;
+  }
+
+  .line {
+    flex: 1;
+    height: 2px;
+    background: var(--rule);
+  }
+
+  .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+  }
+</style>

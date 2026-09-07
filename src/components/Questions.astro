@@ -1,0 +1,166 @@
+---
+import { QUESTION_TIERS, TIME_TIERS } from '../data/content';
+import { waLink } from '../data/site';
+import ChatIcon from './icons/ChatIcon.astro';
+import HourglassIcon from './icons/HourglassIcon.astro';
+---
+
+<section id="perguntas" class="section">
+  <div class="section-head">
+    <h2>Perguntas Avulsas</h2>
+    <span class="rule" style="background:var(--accent-1)"></span>
+  </div>
+
+  <div class="sub-head" style="--accent:var(--accent-1)">
+    <ChatIcon />
+    <h3>Por pergunta</h3>
+    <span class="sub-rule"></span>
+  </div>
+  <p class="lede">Pagamento é feito antes da leitura. As respostas chegam pelo WhatsApp.</p>
+
+  <div class="tiers" style="--accent:var(--accent-1)">
+    {
+      QUESTION_TIERS.map((t) => (
+        <div class:list={['tier', { featured: t.featured }]}>
+          <div class="numline">
+            <span class="num">{t.headline}</span>
+            <span class="unit">{t.unit}</span>
+          </div>
+          <div class="price">{t.priceLabel}</div>
+          <p set:html={t.text} />
+        </div>
+      ))
+    }
+  </div>
+
+  <div class="sub-head spaced" style="--accent:var(--accent-2)">
+    <HourglassIcon />
+    <h3>Por tempo de consulta</h3>
+    <span class="sub-rule"></span>
+  </div>
+  <p class="lede wide">Faça quantas perguntas quiser dentro do horário contratado</p>
+
+  <div class="tiers" style="--accent:var(--accent-2)">
+    {
+      TIME_TIERS.map((t) => (
+        <div class:list={['tier', { featured: t.featured }]}>
+          <div class="numline">
+            <span class="num">{t.headline}</span>
+            <span class="unit">{t.unit}</span>
+          </div>
+          <div class="price">{t.priceLabel}</div>
+          <p set:html={t.text} />
+        </div>
+      ))
+    }
+  </div>
+
+  <div class="cta-row">
+    <a
+      class="btn btn-solid"
+      href={waLink('Olá, gostaria de fazer perguntas avulsas')}
+      target="_blank"
+      rel="noopener">QUERO FAZER PERGUNTAS</a
+    >
+  </div>
+</section>
+
+<style>
+  .section {
+    padding-bottom: 0;
+  }
+
+  .sub-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 0 0 20px;
+  }
+
+  .sub-head.spaced {
+    margin-top: 48px;
+  }
+
+  .sub-head h3 {
+    margin: 0;
+    font-size: 30px;
+    color: var(--clay);
+  }
+
+  .sub-rule {
+    flex: 1;
+    height: 6px;
+    background: var(--accent);
+  }
+
+  .lede {
+    margin: 0 0 22px;
+    font-size: 14.5px;
+    line-height: 1.7;
+    color: var(--body);
+  }
+
+  .lede.wide {
+    max-width: 620px;
+    font-size: 15px;
+  }
+
+  .tiers {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 18px;
+    align-items: stretch;
+  }
+
+  .tier {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 30px 28px;
+    background: var(--surface);
+    border-radius: 14px;
+    box-shadow: var(--shadow-md);
+  }
+
+  .tier.featured {
+    border: 2px solid var(--accent);
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--accent) 25%, transparent);
+  }
+
+  .numline {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .num {
+    font-family: var(--font-serif);
+    font-size: 54px;
+    line-height: 1;
+    color: var(--ink);
+  }
+
+  .unit {
+    font-size: 14px;
+    color: var(--body);
+  }
+
+  .price {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--clay);
+  }
+
+  .tier p {
+    margin: 0;
+    font-size: 14.5px;
+    line-height: 1.7;
+    color: var(--body);
+  }
+
+  @media (max-width: 559px) {
+    .sub-head h3 {
+      font-size: 24px;
+    }
+  }
+</style>

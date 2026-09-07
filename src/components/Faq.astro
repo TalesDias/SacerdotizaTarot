@@ -1,0 +1,188 @@
+---
+import { FAQS } from '../data/content';
+import { waLink } from '../data/site';
+import PixIcon from './icons/PixIcon.astro';
+import CardIcon from './icons/CardIcon.astro';
+---
+
+<section id="faq" class="section">
+  <div class="section-head">
+    <h2>Dúvidas frequentes</h2>
+    <span class="rule narrow" style="background:var(--accent-3)"></span>
+  </div>
+
+  <div class="list">
+    {
+      FAQS.map((f, i) => (
+        <details class="faq" name="faq" open={i === 0}>
+          <summary>
+            <h3>{f.q}</h3>
+            <span class="icon" aria-hidden="true">
+              +
+            </span>
+          </summary>
+          <div class="answer">
+            <p>{f.a}</p>
+            {f.pay && (
+              <div class="pay">
+                <span class="method">
+                  <PixIcon />
+                  Pix
+                </span>
+                <span class="method">
+                  <CardIcon />
+                  Cartão de crédito
+                </span>
+              </div>
+            )}
+          </div>
+        </details>
+      ))
+    }
+  </div>
+
+  <p class="outro">
+    Ficou alguma dúvida? <a href={waLink('Olá, tenho uma dúvida sobre os atendimentos')} target="_blank" rel="noopener">Me chama no WhatsApp</a>.
+  </p>
+</section>
+
+<style>
+  .section {
+    max-width: 760px;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .section-head {
+    margin-bottom: 32px;
+  }
+
+  .section-head h2 {
+    font-size: clamp(30px, 4.4vw, 46px);
+  }
+
+  .rule.narrow {
+    width: 100px;
+  }
+
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .faq {
+    padding: 20px 24px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.62);
+    border: 2px solid rgba(123, 106, 94, 0.1);
+    transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .faq[open] {
+    background: var(--surface);
+    border-color: var(--accent-2);
+    box-shadow: 0 12px 30px rgba(123, 106, 94, 0.1);
+  }
+
+  summary {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  summary h3 {
+    margin: 0;
+    flex: 1;
+    /* The canvas's FAQ headings use the body face, not the display serif. */
+    font-family: var(--font-sans);
+    font-size: 16.5px;
+    font-weight: 700;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+
+  .icon {
+    flex: 0 0 auto;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(123, 106, 94, 0.1);
+    color: var(--clay);
+    font-size: 17px;
+    line-height: 1;
+    font-weight: 700;
+    transition: transform 0.3s var(--ease), background 0.3s, color 0.3s;
+  }
+
+  .faq[open] .icon {
+    background: var(--accent-2);
+    color: #fff;
+    transform: rotate(45deg);
+  }
+
+  .answer p {
+    margin: 14px 0 0;
+    font-size: 14.5px;
+    line-height: 1.75;
+    color: var(--body);
+  }
+
+  .pay {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  .method {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--clay);
+  }
+
+  .method :global(svg) {
+    opacity: 0.85;
+  }
+
+  .outro {
+    margin: 28px 0 0;
+    text-align: center;
+    font-size: 14.5px;
+    line-height: 1.7;
+    color: var(--body);
+  }
+
+  .outro a {
+    color: var(--clay);
+    font-weight: 700;
+  }
+
+  /* Height animation where the browser supports it; instant elsewhere. */
+  @supports selector(::details-content) {
+    .faq::details-content {
+      block-size: 0;
+      overflow: hidden;
+      transition: block-size 0.35s var(--ease), content-visibility 0.35s allow-discrete;
+    }
+
+    .faq[open]::details-content {
+      block-size: auto;
+    }
+  }
+</style>

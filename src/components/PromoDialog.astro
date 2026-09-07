@@ -1,0 +1,126 @@
+---
+import { PROMO_TEXT_PREFIX, PROMO_PRICE, PROMO_TEXT_SUFFIX } from '../data/content';
+import { INSTAGRAM_HANDLE, INSTAGRAM_URL } from '../data/site';
+import SparkleIcon from './icons/SparkleIcon.astro';
+---
+
+<dialog id="promo" aria-labelledby="promo-title">
+  <div class="head">
+    <p id="promo-title" class="title">Promoção</p>
+    <SparkleIcon />
+  </div>
+
+  <p class="pitch">
+    {PROMO_TEXT_PREFIX}<b>{PROMO_PRICE}</b>{PROMO_TEXT_SUFFIX}<b>{INSTAGRAM_HANDLE}</b>.
+  </p>
+
+  <div class="actions">
+    <button type="button" class="btn btn-ghost" data-close>Fechar</button>
+    <a class="btn btn-solid" href={INSTAGRAM_URL} target="_blank" rel="noopener" data-close>
+      Ir para o Instagram
+    </a>
+  </div>
+</dialog>
+
+<script>
+  const dialog = document.getElementById('promo') as HTMLDialogElement | null;
+  const KEY = 'sac-promo-seen';
+
+  if (dialog) {
+    const dismiss = () => {
+      try {
+        localStorage.setItem(KEY, '1');
+      } catch {
+        /* private mode — just close */
+      }
+      dialog.close();
+    };
+
+    dialog.querySelectorAll('[data-close]').forEach((el) => el.addEventListener('click', dismiss));
+    dialog.addEventListener('close', dismiss);
+
+    let seen = false;
+    try {
+      seen = localStorage.getItem(KEY) === '1';
+    } catch {
+      /* treat as unseen */
+    }
+
+    // Desktop only: a crawler arrives with empty localStorage every time, and a
+    // full-screen interstitial on mobile is the pattern Google penalises.
+    const roomy = window.matchMedia('(min-width: 768px)').matches;
+
+    if (!seen && roomy) setTimeout(() => dialog.showModal(), 900);
+  }
+</script>
+
+<style>
+  dialog {
+    width: min(440px, 100%);
+    padding: 38px 34px 32px;
+    border: 2px solid var(--accent-3);
+    border-radius: 22px;
+    background: var(--base);
+    box-shadow: 0 26px 70px rgba(74, 63, 56, 0.28);
+    color: var(--ink);
+  }
+
+  dialog[open] {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    animation: spromo 0.38s var(--ease) both;
+  }
+
+  dialog::backdrop {
+    background: rgba(74, 63, 56, 0.34);
+    backdrop-filter: blur(3px);
+  }
+
+  .head {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .title {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: 40px;
+    line-height: 1;
+    color: var(--clay);
+  }
+
+  .pitch {
+    margin: 0;
+    max-width: 360px;
+    text-align: center;
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--body);
+    text-wrap: pretty;
+  }
+
+  .pitch b {
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 4px;
+  }
+
+  .actions .btn {
+    padding: 13px 26px;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    font-family: inherit;
+  }
+</style>
