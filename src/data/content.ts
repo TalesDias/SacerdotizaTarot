@@ -283,7 +283,10 @@ export const PACKAGES: Package[] = [
 
 export interface Faq {
   q: string;
+  /** Blank lines split paragraphs. May contain <b> — rendered with set:html. */
   a: string;
+  /** Optional bulleted list rendered under the answer. May contain <b>. */
+  items?: string[];
   /** Renders the Pix / credit-card payment icons under the answer. */
   pay?: boolean;
 }
@@ -299,7 +302,12 @@ export const FAQS: Faq[] = [
   },
   {
     q: 'Qual o melhor jeito de fazer uma pergunta para o tarot?',
-    a: 'Seja objetivo! Não queira misturar vários assuntos em uma pergunta só (exemplo: “qual é meu futuro no amor e no trabalho?” pergunte uma coisa de cada vez) e nem queira transformar algo que é para ser duas perguntas em uma (por exemplo: “o que ele pensa e sente por mim?” esse tipo de questão não funciona, pois envolve duas áreas diferentes do ser humano que podem não estar na mesma sintonia! com o coração ele pode te amar, mas com a mente pode ter dúvidas sobre o relacionamento entre vocês...\n o correto seria: “pergunta 1: o que ele pensa sobre mim?; pergunta 2: o que ele sente por mim?”).\n\nTambém evite fazer perguntas que tragam várias opções (exemplo: “serei mais feliz na cidade A ou na cidade B?” prefira perguntar separando as duas coisas para ter uma análise mais completa e profunda: “pergunta 1: como me sentirei na cidade A?” “pergunta 2: como me sentirei na cidade B?”).',
+    a: 'Seja objetivo! Uma pergunta por vez, e cada pergunta sobre um assunto só. As três armadilhas mais comuns:',
+    items: [
+      '<b>Misturar assuntos.</b> Em vez de “qual é meu futuro no amor e no trabalho?”, pergunte um de cada vez.',
+      '<b>Juntar duas perguntas em uma.</b> “O que ele pensa e sente por mim?” não funciona: mente e coração são áreas diferentes e podem não estar na mesma sintonia — com o coração ele pode te amar, mas com a mente ter dúvidas sobre o relacionamento. O certo é perguntar “o que ele pensa sobre mim?” e, separadamente, “o que ele sente por mim?”.',
+      '<b>Dar opções dentro da mesma pergunta.</b> Em vez de “serei mais feliz na cidade A ou na cidade B?”, pergunte “como me sentirei na cidade A?” e “como me sentirei na cidade B?” — assim a análise fica mais completa e profunda.',
+    ],
   },
   {
     q: 'Quero agendar uma tiragem pronta, se fizer isso eu ganho perguntas avulsas?',

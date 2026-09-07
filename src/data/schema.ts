@@ -31,6 +31,14 @@ interface Options {
 
 const brl = (n: number) => n.toFixed(2);
 
+/** One flat, tag-free string per answer — paragraphs and bullets joined. */
+const answerText = (f: { a: string; items?: string[] }) =>
+  [f.a, ...(f.items ?? [])]
+    .join(' ')
+    .replace(/<[^>]+>/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
 export function buildGraph({ siteUrl, portraitUrl }: Options) {
   const base = siteUrl.replace(/\/$/, '');
   const orgId = `${base}/#business`;
@@ -144,7 +152,7 @@ export function buildGraph({ siteUrl, portraitUrl }: Options) {
         mainEntity: FAQS.map((f) => ({
           '@type': 'Question',
           name: f.q,
-          acceptedAnswer: { '@type': 'Answer', text: f.a.replace(/\s*\n+\s*/g, ' ') },
+          acceptedAnswer: { '@type': 'Answer', text: answerText(f) },
         })),
       },
     ],
