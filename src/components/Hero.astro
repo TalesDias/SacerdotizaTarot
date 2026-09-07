@@ -13,8 +13,8 @@ import { SITE_NAME, TAGLINE, TAROLOGA, INSTAGRAM_URL, waLink } from '../data/sit
   </div>
 
   <div class="intro">
-    <div class="portrait-frame">
-      <div class="portrait-ring" data-portrait>
+    <div class="portrait-ring">
+      <div class="portrait-coin" data-portrait>
         <div class="slot">
           <Picture
             src={portrait}
@@ -127,21 +127,26 @@ import { SITE_NAME, TAGLINE, TAROLOGA, INSTAGRAM_URL, waLink } from '../data/sit
     max-width: 900px;
   }
 
-  /* Perspective lives on the parent so the coin has depth as it turns. */
-  .portrait-frame {
-    flex: 0 0 auto;
-    perspective: 1200px;
-  }
-
-  /* The whole disc is the coin — white rim included — so it reads as one
-     object edge-on at 90deg rather than a picture spinning inside a ring. */
+  /*
+   * The ring is the setting, not the coin: it carries the white disc and the
+   * drop shadow and must never transform, or both foreshorten to an edge along
+   * with the portrait. It only supplies the perspective its child turns in.
+   */
   .portrait-ring {
     position: relative;
+    flex: 0 0 auto;
     width: calc(min(260px, 58vw) + 24px);
     height: calc(min(260px, 58vw) + 24px);
     border-radius: 50%;
     background: var(--surface);
     box-shadow: 0 14px 40px rgba(123, 106, 94, 0.14);
+    perspective: 1000px;
+  }
+
+  /* Inset by the rim width, so only the imagery spins inside the white disc. */
+  .portrait-coin {
+    position: absolute;
+    inset: 12px;
     transform-style: preserve-3d;
     transition: transform 0.95s cubic-bezier(0.45, 0.05, 0.35, 1);
   }
