@@ -13,9 +13,9 @@ import { SITE_NAME, TAGLINE, TAROLOGA, INSTAGRAM_URL, waLink } from '../data/sit
   </div>
 
   <div class="intro">
-    <div class="portrait-ring">
-      <div class="portrait-stack" data-portrait>
-        <div class="slot is-active">
+    <div class="portrait-frame">
+      <div class="portrait-ring" data-portrait>
+        <div class="slot">
           <Picture
             src={portrait}
             alt={`${TAROLOGA}, taróloga e mestre de baralho cigano`}
@@ -61,18 +61,15 @@ import { SITE_NAME, TAGLINE, TAROLOGA, INSTAGRAM_URL, waLink } from '../data/sit
 </header>
 
 <script>
-  const stack = document.querySelector<HTMLElement>('[data-portrait]');
-  const slots = stack ? [...stack.querySelectorAll('.slot')] : [];
+  const coin = document.querySelector<HTMLElement>('[data-portrait]');
 
-  if (slots.length > 1 && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    let i = 0;
-    let flips = 0;
+  if (coin && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let turns = 0;
     const step = () => {
-      slots[i]!.classList.remove('is-active');
-      i = (i + 1) % slots.length;
-      slots[i]!.classList.add('is-active');
-      // The first two changes come quickly, then it settles into a slow rotation.
-      setTimeout(step, ++flips < 2 ? 2000 : 10000);
+      // Accumulating keeps it spinning the same way instead of rocking back.
+      coin.style.transform = `rotateY(${++turns * 180}deg)`;
+      // The first two turns come quickly, then it settles into a slow rotation.
+      setTimeout(step, turns < 2 ? 2000 : 10000);
     };
     setTimeout(step, 2000);
   }
@@ -130,29 +127,35 @@ import { SITE_NAME, TAGLINE, TAROLOGA, INSTAGRAM_URL, waLink } from '../data/sit
     max-width: 900px;
   }
 
-  .portrait-ring {
+  /* Perspective lives on the parent so the coin has depth as it turns. */
+  .portrait-frame {
     flex: 0 0 auto;
-    padding: 12px;
+    perspective: 1200px;
+  }
+
+  /* The whole disc is the coin — white rim included — so it reads as one
+     object edge-on at 90deg rather than a picture spinning inside a ring. */
+  .portrait-ring {
+    position: relative;
+    width: calc(min(260px, 58vw) + 24px);
+    height: calc(min(260px, 58vw) + 24px);
     border-radius: 50%;
     background: var(--surface);
     box-shadow: 0 14px 40px rgba(123, 106, 94, 0.14);
+    transform-style: preserve-3d;
+    transition: transform 0.95s cubic-bezier(0.45, 0.05, 0.35, 1);
   }
 
-  .portrait-stack {
-    position: relative;
-    width: min(260px, 58vw);
-    height: min(260px, 58vw);
-  }
-
+  /* Two faces of the same disc. The back one is pre-turned, so every 180deg
+     of the parent swaps which one points at the viewer — no class toggling. */
   .slot {
     position: absolute;
-    inset: 0;
-    opacity: 0;
-    transition: opacity 0.8s ease;
+    inset: 12px;
+    backface-visibility: hidden;
   }
 
-  .slot.is-active {
-    opacity: 1;
+  .slot:nth-child(2) {
+    transform: rotateY(180deg);
   }
 
   .portrait {
