@@ -14,8 +14,16 @@ import PackageCard from './PackageCard.astro';
     </p>
   </div>
 
-  <div class="row">
+  <div class="row" data-pkg-row>
     {PACKAGES.map((pkg) => <div class="slot"><PackageCard pkg={pkg} /></div>)}
+  </div>
+
+  <div class="dots" data-pkg-dots>
+    {
+      PACKAGES.map((pkg, i) => (
+        <button type="button" class="dot" aria-label={`Ver ${pkg.name}`} aria-current={i === 0 ? 'true' : 'false'} />
+      ))
+    }
   </div>
 
   <div class="cta-row">
@@ -62,6 +70,64 @@ import PackageCard from './PackageCard.astro';
   }
 
   /*
+   * Phones: one card at a time, swiped. Five stacked cards made the section a
+   * long scroll on its own, and the arc below needs width the phone has not
+   * got. 759px is the same line the reading grid drops to one column at.
+   */
+  @media (max-width: 759px) {
+    .row {
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      /* Equal-height cards: without this each snaps to its own content and the
+         strip's baseline jumps card to card as you swipe. */
+      align-items: stretch;
+      gap: 14px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-padding-inline: 24px;
+      /* Keeps a swipe past the last card from triggering back-navigation. */
+      overscroll-behavior-x: contain;
+      scrollbar-width: none;
+      /* overflow-x clips the y axis too, so the card shadow needs room inside
+         the scrollport; the matching negative margins hand that room back to
+         the layout, leaving the section's spacing exactly as it was. */
+      margin: -10px -24px -26px;
+      padding: 10px 0 26px;
+    }
+
+    .row::-webkit-scrollbar {
+      display: none;
+    }
+
+    .slot {
+      /* Never a full card width, so the next one always peeks and the strip
+         reads as swipeable without a hint under it. */
+      flex: 0 0 78%;
+      min-width: 0;
+      max-width: none;
+      scroll-snap-align: start;
+    }
+
+    /* Safari drops a horizontal scroller's trailing padding, so the end gutter
+       is a margin on the last card instead. */
+    .slot:first-child {
+      margin-left: 24px;
+    }
+
+    .slot:last-child {
+      margin-right: 24px;
+    }
+
+    .dots[data-ready] {
+      display: flex;
+    }
+
+    .cta-row {
+      margin-top: 22px;
+    }
+  }
+
+  /*
    * Above 1180px the five cards fan into an arc and the row breaks out of the
    * 1180px container. The canvas drove this from a window resize listener.
    */
@@ -92,7 +158,91 @@ import PackageCard from './PackageCard.astro';
     }
   }
 
+  /* Hidden until the script wires them up, so a visitor without JS is never
+     shown a row of dead controls under a strip that still swipes fine. */
+  .dots {
+    display: none;
+    justify-content: center;
+    gap: 2px;
+    margin-top: 14px;
+  }
+
+  .dot {
+    display: grid;
+    place-items: center;
+    /* 8px of paint, but a 24px target — the WCAG 2.5.8 minimum. */
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  .dot::before {
+    content: '';
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    /* Hollow vs filled carries the state, both drawn in clay. A pale fill would
+       sit at 1.4:1 on the cream and effectively disappear — WCAG 1.4.11 wants
+       3:1 for a control you have to see to use. */
+    box-shadow: inset 0 0 0 1.5px var(--clay);
+    transition:
+      background 0.25s var(--ease),
+      transform 0.25s var(--ease);
+  }
+
+  .dot[aria-current='true']::before {
+    background: var(--clay);
+    transform: scale(1.3);
+  }
+
+  .dot:focus-visible {
+    outline: 2px solid var(--clay);
+    outline-offset: 1px;
+  }
+
   .cta-row {
     margin-top: 30px;
   }
 </style>
+
+<script>
+  const row = document.querySelector<HTMLElement>('[data-pkg-row]');
+  const dots = document.querySelector<HTMLElement>('[data-pkg-dots]');
+
+  if (row && dots) {
+    const slots = [...row.children];
+    const buttons = [...dots.children] as HTMLButtonElement[];
+
+    dots.dataset.ready = '';
+
+    buttons.forEach((button, i) => {
+      button.addEventListener('click', () => {
+        slots[i].scrollIntoView({
+          behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+          block: 'nearest',
+          inline: 'start',
+        });
+      });
+    });
+
+    // A card is "current" once it fills 80% of the strip. Cards are 78% of the
+    // scrollport, so two can never clear that bar at once and exactly one dot
+    // is ever marked, mid-swipe included.
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          const current = slots.indexOf(entry.target);
+          buttons.forEach((button, i) => button.setAttribute('aria-current', String(i === current)));
+        }
+      },
+      { root: row, threshold: 0.8 },
+    );
+
+    slots.forEach((slot) => observer.observe(slot));
+  }
+</script>
