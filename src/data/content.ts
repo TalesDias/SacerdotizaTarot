@@ -302,6 +302,10 @@ export const FAQS: Faq[] = [
     a: 'Não, as tiragens prontas são feitas agendando dia e horário! Já as perguntas avulsas são feitas de acordo com minha disponibilidade, normalmente consigo respondê-las em até 2-3 horas. Todos os atendimentos são feitos por WhatsApp com envio de fotos das cartas e áudios das explicações.',
   },
   {
+    q: 'Você atende em quais dias?',
+    a: 'Atendo <b>todos os dias</b>, incluindo fins de semana e feriados. É só me chamar no WhatsApp que combinamos o melhor dia e horário para você.',
+  },
+  {
     q: 'Decidi que vou tirar tarot, preciso passar alguma informação minha?',
     a: 'Sim, preciso do seu nome completo e data de nascimento. Se for uma tiragem/pergunta que envolve outras pessoas, preciso do nome completo e data de nascimento delas também.',
   },

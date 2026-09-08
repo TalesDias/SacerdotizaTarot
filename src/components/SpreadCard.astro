@@ -202,6 +202,32 @@ const { reading, peek } = Astro.props;
     transition-delay: 220ms;
   }
 
+  /*
+   * One column, so the card is wide and the peek lands squarely on the text.
+   * It lifts less here — 12px, inside the 18px gap above — so it stays clear of
+   * the group heading and its note instead of rising into them.
+   */
+  @media (max-width: 759px) {
+    .card:hover .peek,
+    .card:focus-within .peek {
+      transform: translateY(-12px) rotate(5deg);
+    }
+  }
+
+  /* Narrower still, and a one-line title reaches under the peek — "O Jogo da
+     Perspectiva" lost its last word. The title gives up that column and wraps
+     a word early instead; the tag it shares the row with is hidden by the time
+     the peek arrives. */
+  @media (max-width: 419px) {
+    .peek {
+      width: 46px;
+    }
+
+    .head {
+      padding-right: 46px;
+    }
+  }
+
   /* Where there is no hover the card is tapped, so it should look tappable.
      iOS also needs a pointer cursor before it treats a non-form element as
      tappable, which is what makes the tap focus it. */

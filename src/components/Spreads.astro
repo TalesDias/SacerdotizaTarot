@@ -110,7 +110,11 @@ const groups = READING_GROUPS.map((g) => ({
 
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    /* Three across at most: six readings then read as 3 + 3 rather than the
+       lopsided 4 + 2 a plain 250px minimum produced. Raising the minimum to a
+       third of the row is what caps the count, and `auto-fit` still lets a
+       group of two stretch to fill the row. */
+    grid-template-columns: repeat(auto-fit, minmax(max(250px, (100% - 2 * 18px) / 3), 1fr));
     gap: 18px;
     align-items: start;
   }

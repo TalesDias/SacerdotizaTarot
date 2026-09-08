@@ -2,9 +2,11 @@
 /**
  * The eight blurred colour blobs behind the page.
  *
- * In the canvas these were re-computed on every scroll event, but the parallax
- * multiplier was 0 — the transform always resolved to translate3d(0,0,0). They
- * are static, so this is plain CSS with no listener.
+ * The canvas re-computed these on every scroll event, but its parallax
+ * multiplier was 0, so the transform always resolved to translate3d(0,0,0).
+ * The `p` below is that multiplier, given a real value: the further a blob is
+ * from the middle of the screen the more it is pushed back, which reads as
+ * depth. Small numbers — this should be felt rather than noticed.
  */
 const PALETTE = ['#f4a3b4', '#93d2d4', '#cfc0ee', '#e3d9a8'];
 const SHAPES = [
@@ -15,19 +17,20 @@ const SHAPES = [
 ];
 
 const SPOTS = [
-  { top: '1%', left: '-9%', size: '44vw', c: 3, o: 0.95, b: 3, d: 26 },
-  { top: '11%', right: '-13%', size: '34vw', c: 1, o: 0.8, b: 4, d: 32 },
-  { top: '26%', left: '-7%', size: '26vw', c: 2, o: 0.75, b: 5, d: 29 },
-  { top: '38%', right: '-5%', size: '22vw', c: 3, o: 0.8, b: 4, d: 35 },
-  { top: '52%', left: '4%', size: '17vw', c: 1, o: 0.7, b: 6, d: 24 },
-  { top: '64%', right: '-9%', size: '30vw', c: 2, o: 0.8, b: 5, d: 31 },
-  { top: '79%', left: '-11%', size: '28vw', c: 3, o: 0.75, b: 5, d: 28 },
-  { top: '91%', right: '3%', size: '15vw', c: 1, o: 0.7, b: 4, d: 33 },
+  { top: '1%', left: '-9%', size: '44vw', c: 3, o: 0.95, b: 3, d: 26, p: 0.14 },
+  { top: '11%', right: '-13%', size: '34vw', c: 1, o: 0.8, b: 4, d: 32, p: 0.07 },
+  { top: '26%', left: '-7%', size: '26vw', c: 2, o: 0.75, b: 5, d: 29, p: 0.17 },
+  { top: '38%', right: '-5%', size: '22vw', c: 3, o: 0.8, b: 4, d: 35, p: 0.09 },
+  { top: '52%', left: '4%', size: '17vw', c: 1, o: 0.7, b: 6, d: 24, p: 0.2 },
+  { top: '64%', right: '-9%', size: '30vw', c: 2, o: 0.8, b: 5, d: 31, p: 0.08 },
+  { top: '79%', left: '-11%', size: '28vw', c: 3, o: 0.75, b: 5, d: 28, p: 0.15 },
+  { top: '91%', right: '3%', size: '15vw', c: 1, o: 0.7, b: 4, d: 33, p: 0.11 },
 ];
 
 const wash = (hex: string) => `color-mix(in oklab, ${hex} 62%, #fff8f2)`;
 
 const blobs = SPOTS.map((s, i) => ({
+  p: s.p,
   outer: [
     'position:absolute',
     `top:${s.top}`,
@@ -46,9 +49,64 @@ const blobs = SPOTS.map((s, i) => ({
 }));
 ---
 
-<div class="backdrop" aria-hidden="true">
-  {blobs.map((b) => <div style={b.outer}><div class="blob-inner" style={b.inner} /></div>)}
+<div class="backdrop" aria-hidden="true" data-backdrop>
+  {
+    blobs.map((b) => (
+      <div style={b.outer} data-p={b.p}>
+        <div class="blob-inner" style={b.inner} />
+      </div>
+    ))
+  }
 </div>
+
+<script>
+  const layer = document.querySelector<HTMLElement>('[data-backdrop]');
+
+  if (layer && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const blobs = [...layer.children] as HTMLElement[];
+    const depth = blobs.map((b) => Number(b.dataset.p) || 0);
+
+    // Measured once, untransformed, so a frame never reads back a position this
+    // script itself moved. Recomputed on resize, where the vw sizes change.
+    let anchors: number[] = [];
+    const measure = () => {
+      for (const b of blobs) b.style.transform = '';
+      anchors = blobs.map((b) => {
+        const box = b.getBoundingClientRect();
+        return box.top + scrollY + box.height / 2;
+      });
+    };
+
+    // Offset from the middle of the screen rather than from the top of the
+    // document: the further a blob is from the eye the more it lags, and the
+    // shift stays small near the viewport instead of growing with the scroll —
+    // which would drag every blob out of the clipped backdrop by the footer.
+    const draw = () => {
+      const eye = scrollY + innerHeight / 2;
+      blobs.forEach((b, i) => {
+        b.style.transform = `translate3d(0, ${((eye - anchors[i]) * depth[i]).toFixed(1)}px, 0)`;
+      });
+    };
+
+    let queued = false;
+    const onScroll = () => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(() => {
+        queued = false;
+        draw();
+      });
+    };
+
+    measure();
+    draw();
+    addEventListener('scroll', onScroll, { passive: true });
+    addEventListener('resize', () => {
+      measure();
+      draw();
+    });
+  }
+</script>
 
 <style>
   .backdrop {

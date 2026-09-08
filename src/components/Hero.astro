@@ -177,6 +177,10 @@ import { SITE_NAME, TAGLINE, TAROLOGA, INSTAGRAM_URL, waLink } from '../data/sit
     max-width: 530px;
     margin: 0;
     text-align: justify;
+    /* Justifying a ~340px column opens rivers of whitespace. Hyphenation is
+       what closes them: <html lang="pt-BR"> gives the browser the Portuguese
+       patterns, so it can break inside words instead of stretching the spaces. */
+    hyphens: auto;
     font-size: 17px;
     line-height: 1.75;
     color: var(--body);
@@ -186,7 +190,9 @@ import { SITE_NAME, TAGLINE, TAROLOGA, INSTAGRAM_URL, waLink } from '../data/sit
   .actions {
     position: relative;
     display: flex;
-    flex-wrap: wrap;
+    /* Two short buttons: side by side at every width, rather than stacking into
+       a column on a narrow phone. */
+    flex-wrap: nowrap;
     gap: 14px;
     justify-content: center;
   }
@@ -197,6 +203,18 @@ import { SITE_NAME, TAGLINE, TAROLOGA, INSTAGRAM_URL, waLink } from '../data/sit
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: none;
+    white-space: nowrap;
+  }
+
+  /* Narrow enough that the pair would otherwise overflow the row. */
+  @media (max-width: 400px) {
+    .actions {
+      gap: 10px;
+    }
+
+    .actions .btn {
+      padding: 13px 18px;
+    }
   }
 
   .pip {
@@ -224,14 +242,6 @@ import { SITE_NAME, TAGLINE, TAROLOGA, INSTAGRAM_URL, waLink } from '../data/sit
 
   .scroll-cue:hover {
     color: var(--ink);
-  }
-
-  /* Justified text on a ~340px column opens rivers of whitespace; the canvas
-     only ever rendered this at desktop width. */
-  @media (max-width: 559px) {
-    .bio {
-      text-align: left;
-    }
   }
 
   .arrow {
