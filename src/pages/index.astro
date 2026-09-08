@@ -71,9 +71,15 @@ const portraitImg = await getImage({ src: portrait, format: 'webp', width: 520 }
     z-index: 1;
     display: grid;
     justify-items: center;
-    gap: 20px;
+    /*
+     * Generous, because the brand line wraps to two lines on a phone and the
+     * chip must not read as a third one. The bottom padding matches the left
+     * inset instead of the section rhythm: the chip sits in the page's corner,
+     * so the two edges it hangs off should be the same distance away.
+     */
+    gap: 46px;
     margin-top: 16px;
-    padding: 0 24px 96px;
+    padding: 0 24px 24px;
     text-align: center;
     color: var(--clay);
   }
