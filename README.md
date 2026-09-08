@@ -26,24 +26,40 @@ Set it in the Cloudflare Pages project under **Settings → Environment variable
 SITE_URL = https://seudominio.com.br
 ```
 
-## Cloudflare Pages settings
+## Cloudflare
 
-Astro 7 needs **Node >= 22.12.0**; Cloudflare's build image still defaults to
-Node 18, which is what breaks the build. `.nvmrc` pins it, so the version lives
-in the repo rather than in a dashboard field somebody has to remember.
-
+Deployed as a **Worker serving static assets** (not a Pages project):
+`sacerdotiza-tarot.dtales15.workers.dev`. `wrangler.jsonc` declares it — no
+`main`, just `assets.directory` pointing at `dist/`, so the deploy uploads the
+built files and runs no server code.
 
 | | |
 |---|---|
 | Build command | `npm run build` |
+| Deploy command | `npx wrangler deploy` |
 | Output directory | `dist` |
 | Node version | pinned to 22.12.0 by `.nvmrc` |
 
-`public/_headers` ships the cache and security headers; Pages picks it up automatically.
+Two settings exist because Cloudflare's "import a repository" flow guesses, and
+guessed wrong once already:
 
-**Analytics:** enable Cloudflare Web Analytics on the Pages project in the dashboard.
-It auto-injects the beacon — nothing to add here. It sets no cookies, so no consent
-banner is needed.
+- **`.nvmrc`** — Astro 7 needs Node >= 22.12.0; the build image defaults to 18.
+- **`output: 'static'`** in `astro.config.mjs` — the import flow fits an SSR
+  adapter to Astro projects, and a server-rendered build defers every image to
+  the `/_image` endpoint rather than optimising it at build. Deployed as static
+  assets, nothing answers `/_image`, so every image 404s while the HTML, CSS and
+  fonts look fine. Stating `output` keeps the images as files.
+
+`public/_headers` ships the cache and security headers.
+
+**Before the custom domain:** `site` in `astro.config.mjs` falls back to the
+workers.dev URL. Once the domain is live, set a `SITE_URL` build variable (or
+change the fallback) — canonical, Open Graph, sitemap and JSON-LD all derive
+from it.
+
+**Analytics:** enable Cloudflare Web Analytics on the project in the dashboard.
+It auto-injects the beacon — nothing to add here. It sets no cookies, so no
+consent banner is needed.
 
 ## Where things live
 

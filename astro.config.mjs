@@ -1,14 +1,22 @@
 import { defineConfig, fontProviders } from 'astro/config';
 
-// The custom domain is not registered yet. Cloudflare Pages serves every project
-// on a working *.pages.dev URL, so that is the fallback; set SITE_URL in the
-// Pages build settings (or a local .env) once the real domain is live. Canonical,
-// Open Graph, sitemap and JSON-LD URLs all derive from this one value.
-const site = process.env.SITE_URL ?? 'https://sacerdotiza-tarot.pages.dev';
+// The custom domain is not registered yet, so the fallback is the workers.dev
+// URL the site is actually reachable on — a canonical tag pointing at a host
+// that does not exist is worse than a temporary one. Set SITE_URL (build
+// variable, or a local .env) once the real domain is live. Canonical, Open
+// Graph, sitemap and JSON-LD URLs all derive from this one value.
+const site = process.env.SITE_URL ?? 'https://sacerdotiza-tarot.dtales15.workers.dev';
 
 export default defineConfig({
   site,
   trailingSlash: 'never',
+
+  // Explicit, though it is the default. Cloudflare's "import a repository" flow
+  // fits an SSR adapter to an Astro project, and a server-rendered build defers
+  // every image to the /_image endpoint instead of optimising it at build time —
+  // which is exactly how the images broke. Stated here, the pages prerender and
+  // the images come out as files whatever the build container decides to add.
+  output: 'static',
 
   fonts: [
     {
