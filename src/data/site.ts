@@ -10,6 +10,10 @@ export const WHATSAPP_NUMBER = '5535984356580';
 export const INSTAGRAM_HANDLE = 'a_sacerdotiza';
 export const INSTAGRAM_URL = `https://instagram.com/${INSTAGRAM_HANDLE}`;
 
+/** Site credit in the footer. */
+export const DEVELOPER = 'TalesDias';
+export const DEVELOPER_URL = `https://github.com/${DEVELOPER}`;
+
 export const SEO_TITLE = 'A Sacerdotiza Tarot | Tarot e Baralho Cigano Online';
 export const SEO_DESCRIPTION =
   'Tiragens de tarot e baralho cigano com Yara Faria: amor, autoconhecimento, ' +

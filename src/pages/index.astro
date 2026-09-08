@@ -10,7 +10,14 @@ import Packages from '../components/Packages.astro';
 import Faq from '../components/Faq.astro';
 import PromoDialog from '../components/PromoDialog.astro';
 import portrait from '../assets/yara.webp';
-import { SITE_NAME, INSTAGRAM_HANDLE, INSTAGRAM_URL } from '../data/site';
+import GitHubIcon from '../components/icons/GitHubIcon.astro';
+import {
+  SITE_NAME,
+  INSTAGRAM_HANDLE,
+  INSTAGRAM_URL,
+  DEVELOPER,
+  DEVELOPER_URL,
+} from '../data/site';
 
 // Resolved build path, so the structured data points at a real image.
 const portraitImg = await getImage({ src: portrait, format: 'webp', width: 520 });
@@ -32,7 +39,14 @@ const portraitImg = await getImage({ src: portrait, format: 'webp', width: 520 }
     </main>
 
     <footer>
-      {SITE_NAME} · <a href={INSTAGRAM_URL} target="_blank" rel="noopener">{INSTAGRAM_HANDLE}</a>
+      <p class="brand">
+        {SITE_NAME} · <a href={INSTAGRAM_URL} target="_blank" rel="noopener">{INSTAGRAM_HANDLE}</a>
+      </p>
+      <p class="credit">
+        Desenvolvido por <a href={DEVELOPER_URL} target="_blank" rel="noopener">
+          <GitHubIcon />{DEVELOPER}
+        </a>
+      </p>
     </footer>
   </div>
 
@@ -58,10 +72,43 @@ const portraitImg = await getImage({ src: portrait, format: 'webp', width: 520 }
     margin-top: 16px;
     padding: 0 24px 96px;
     text-align: center;
+    color: var(--clay);
+  }
+
+  .brand {
+    margin: 0;
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.24em;
     text-transform: uppercase;
-    color: var(--clay);
+  }
+
+  /*
+   * Deliberately quieter than the line above it: sentence case, lighter and
+   * smaller, with a fraction of the tracking. Two spaced-out uppercase lines
+   * would read as a pair of equals and pull attention to the wrong one — this
+   * one is a signature, not part of the brand. Still --clay, though, because
+   * the palette's lighter --muted sits at 2.87:1 on the cream.
+   */
+  .credit {
+    margin: 10px 0 0;
+    font-size: 11.5px;
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    /* The username is camel case; uppercasing it would lose that. */
+    text-transform: none;
+  }
+
+  .credit a {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 600;
+    /* Keeps the mark glued to the name if the line wraps on a narrow screen. */
+    white-space: nowrap;
+  }
+
+  .credit a:hover svg {
+    color: inherit;
   }
 </style>
