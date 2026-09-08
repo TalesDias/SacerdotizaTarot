@@ -28,11 +28,16 @@ SITE_URL = https://seudominio.com.br
 
 ## Cloudflare Pages settings
 
+Astro 7 needs **Node >= 22.12.0**; Cloudflare's build image still defaults to
+Node 18, which is what breaks the build. `.nvmrc` pins it, so the version lives
+in the repo rather than in a dashboard field somebody has to remember.
+
+
 | | |
 |---|---|
 | Build command | `npm run build` |
 | Output directory | `dist` |
-| Node version | 20 or newer |
+| Node version | pinned to 22.12.0 by `.nvmrc` |
 
 `public/_headers` ships the cache and security headers; Pages picks it up automatically.
 
