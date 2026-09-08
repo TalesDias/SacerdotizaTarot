@@ -25,11 +25,50 @@ import SparkleIcon from './icons/SparkleIcon.astro';
 <script>
   const dialog = document.getElementById('promo') as HTMLDialogElement | null;
   const KEY = 'sac-promo-seen';
+  // Friday 09:00 to Saturday 09:00.
+  const OPENS = 9;
 
   if (dialog) {
+    // Which window we are in, as the date of its Friday — '' outside one. Read
+    // on Brazil's clock, not the visitor's: the promo runs in Yara's stories,
+    // so someone reading from Lisbon should see it while it is actually live.
+    const promoWeek = () => {
+      const parts = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'America/Sao_Paulo',
+        weekday: 'short',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        hourCycle: 'h23',
+      }).formatToParts(new Date());
+      const at = (type: Intl.DateTimeFormatPartTypes) =>
+        parts.find((part) => part.type === type)?.value ?? '';
+
+      const day = at('weekday');
+      const hour = +at('hour');
+      const saturday = day === 'Sat' && hour < OPENS;
+      if (!saturday && !(day === 'Fri' && hour >= OPENS)) return '';
+
+      // Saturday morning still belongs to Friday's window, so both halves store
+      // and compare the same key and one dismissal covers the whole 24 hours.
+      return new Date(Date.UTC(+at('year'), +at('month') - 1, +at('day') - (saturday ? 1 : 0)))
+        .toISOString()
+        .slice(0, 10);
+    };
+
+    let week = '';
+    try {
+      week = promoWeek();
+    } catch {
+      /* no Intl time zones — leave it closed rather than show it off-schedule */
+    }
+
     const dismiss = () => {
       try {
-        localStorage.setItem(KEY, '1');
+        // Keyed to the window, so closing it this Friday does not silence it
+        // every Friday after.
+        localStorage.setItem(KEY, week);
       } catch {
         /* private mode — just close */
       }
@@ -41,7 +80,7 @@ import SparkleIcon from './icons/SparkleIcon.astro';
 
     let seen = false;
     try {
-      seen = localStorage.getItem(KEY) === '1';
+      seen = localStorage.getItem(KEY) === week;
     } catch {
       /* treat as unseen */
     }
@@ -50,7 +89,7 @@ import SparkleIcon from './icons/SparkleIcon.astro';
     // full-screen interstitial on mobile is the pattern Google penalises.
     const roomy = window.matchMedia('(min-width: 768px)').matches;
 
-    if (!seen && roomy) setTimeout(() => dialog.showModal(), 900);
+    if (week && !seen && roomy) setTimeout(() => dialog.showModal(), 900);
   }
 </script>
 
