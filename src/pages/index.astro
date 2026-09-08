@@ -69,6 +69,9 @@ const portraitImg = await getImage({ src: portrait, format: 'webp', width: 520 }
   footer {
     position: relative;
     z-index: 1;
+    display: grid;
+    justify-items: center;
+    gap: 20px;
     margin-top: 16px;
     padding: 0 24px 96px;
     text-align: center;
@@ -84,31 +87,60 @@ const portraitImg = await getImage({ src: portrait, format: 'webp', width: 520 }
   }
 
   /*
-   * Deliberately quieter than the line above it: sentence case, lighter and
-   * smaller, with a fraction of the tracking. Two spaced-out uppercase lines
-   * would read as a pair of equals and pull attention to the wrong one — this
-   * one is a signature, not part of the brand. Still --clay, though, because
-   * the palette's lighter --muted sits at 2.87:1 on the cream.
+   * A maker's mark rather than a third brand line: pulled out of the centred
+   * column into the page's bottom-left corner and set on its own clay chip, so
+   * it reads as a signature beside the footer instead of competing with it.
    */
   .credit {
-    margin: 10px 0 0;
+    justify-self: start;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: var(--clay);
+    /* Cream on clay measures 4.79:1 — AA for text this small. */
+    color: var(--base);
     font-size: 11.5px;
     font-weight: 400;
     letter-spacing: 0.06em;
     /* The username is camel case; uppercasing it would lose that. */
     text-transform: none;
+    white-space: nowrap;
+    box-shadow: var(--shadow-sm);
+    transition:
+      background 220ms var(--ease),
+      transform 220ms var(--ease);
   }
 
+  .credit:hover {
+    background: var(--ink);
+    transform: translateY(-1px);
+  }
+
+  /*
+   * Only the name is the link, so it carries the weight and the underline; the
+   * padding buys it a 24px-tall hit target and the matching negative margin
+   * keeps that off the chip's own size.
+   */
   .credit a {
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    font-weight: 600;
-    /* Keeps the mark glued to the name if the line wraps on a narrow screen. */
+    padding: 5px 6px;
+    margin: -5px -6px;
+    color: inherit;
+    font-weight: 700;
+    /* Keeps the mark glued to the name if the line ever wraps. */
     white-space: nowrap;
   }
 
-  .credit a:hover svg {
+  .credit a:hover,
+  .credit a:focus-visible {
     color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
+
 </style>
