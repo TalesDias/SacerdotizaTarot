@@ -1,7 +1,15 @@
 ---
 import { PROMOS } from '../data/content';
 import { INSTAGRAM_URL, waLink } from '../data/site';
+import HeartIcon from './icons/HeartIcon.astro';
 import SparkleIcon from './icons/SparkleIcon.astro';
+import ToastIcon from './icons/ToastIcon.astro';
+
+const ICONS: Record<string, typeof SparkleIcon> = {
+  namorados: HeartIcon,
+  caixinha: SparkleIcon,
+  'ano-novo': ToastIcon,
+};
 
 // The year-end promo names the year its season looks ahead to. This is only the
 // value at build time — the script rewrites it from the visitor's clock, which
@@ -10,33 +18,36 @@ const year = new Date().getFullYear() + 1;
 ---
 
 {
-  PROMOS.map((promo) => (
-    <dialog data-promo={promo.id} aria-labelledby={`promo-${promo.id}`}>
-      <div class="head">
-        <p id={`promo-${promo.id}`} class="title">
-          {promo.title}
-        </p>
-        <SparkleIcon />
-      </div>
+  PROMOS.map((promo) => {
+    const Icon = ICONS[promo.id] ?? SparkleIcon;
+    return (
+      <dialog data-promo={promo.id} aria-labelledby={`promo-${promo.id}`}>
+        <div class="head">
+          <p id={`promo-${promo.id}`} class="title">
+            {promo.title}
+          </p>
+          <Icon />
+        </div>
 
-      <p class="pitch" set:html={promo.text.replace('{ano}', `<b data-year>${year}</b>`)} />
+        <p class="pitch" set:html={promo.text.replace('{ano}', `<b data-year>${year}</b>`)} />
 
-      <div class="actions">
-        <button type="button" class="btn btn-ghost" data-close>
-          Fechar
-        </button>
-        <a
-          class="btn btn-solid"
-          href={promo.instagram ? INSTAGRAM_URL : waLink(promo.message)}
-          target="_blank"
-          rel="noopener"
-          data-close
-        >
-          {promo.cta}
-        </a>
-      </div>
-    </dialog>
-  ))
+        <div class="actions">
+          <button type="button" class="btn btn-ghost" data-close>
+            Fechar
+          </button>
+          <a
+            class="btn btn-solid"
+            href={promo.instagram ? INSTAGRAM_URL : waLink(promo.message)}
+            target="_blank"
+            rel="noopener"
+            data-close
+          >
+            {promo.cta}
+          </a>
+        </div>
+      </dialog>
+    );
+  })
 }
 
 <script>
@@ -218,5 +229,18 @@ const year = new Date().getFullYear() + 1;
     letter-spacing: 0.08em;
     cursor: pointer;
     font-family: inherit;
+    justify-content: center;
+  }
+
+  /* Narrow enough that the two buttons stack. Reversed, so booking sits above
+     Fechar — the action someone came for should be the one under their thumb,
+     not the one below it. Document order is left alone: Fechar stays the first
+     tab stop, and this is the same 768px line the dialog itself is gated on. */
+  @media (max-width: 767px) {
+    .actions {
+      flex-direction: column-reverse;
+      align-self: stretch;
+      gap: 10px;
+    }
   }
 </style>
