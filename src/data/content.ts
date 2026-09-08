@@ -1,3 +1,5 @@
+import { INSTAGRAM_HANDLE } from './site';
+
 /**
  * Every priced item and every FAQ, transcribed verbatim from the Claude Design
  * canvas. This is the single source of truth: the page renders from it and the
@@ -342,6 +344,45 @@ export const BIO =
   'sobre uma escolha importante, entender o futuro de um relacionamento difícil, se autoconhecer ' +
   'melhor e te proporcionar uma experiência ímpar com as cartas.';
 
-export const PROMO_TEXT_PREFIX = 'Perguntas avulsas por apenas ';
-export const PROMO_PRICE = 'R$ 5';
-export const PROMO_TEXT_SUFFIX = ' nos stories da ';
+export interface Promo {
+  /** Matches `data-promo` on the dialog, and names its localStorage key. */
+  id: string;
+  title: string;
+  /** Body copy. May contain <b>; `{ano}` becomes the year the season looks ahead to. */
+  text: string;
+  cta: string;
+  /** Sends to the Instagram profile rather than WhatsApp. */
+  instagram?: boolean;
+  /** Pre-filled WhatsApp message, for everything without `instagram`. */
+  message?: string;
+}
+
+/**
+ * Highest priority first. One dialog at most is ever shown: the first of these
+ * whose window is open. The windows themselves are in PromoDialog.astro, where
+ * the clock is read.
+ */
+export const PROMOS: Promo[] = [
+  {
+    id: 'namorados',
+    title: 'Dia dos Namorados',
+    text: '<b>15% off</b> em qualquer tiragem de vida amorosa.',
+    cta: 'Agendar tiragem',
+    message:
+      'Olá, vi a promoção de Dia dos Namorados e gostaria de agendar uma tiragem de vida amorosa',
+  },
+  {
+    id: 'caixinha',
+    title: 'Caixinha do Tarot',
+    text: `Perguntas avulsas por apenas <b>R$ 5</b> nos stories da <b>${INSTAGRAM_HANDLE}</b>.`,
+    cta: 'Ir para o Instagram',
+    instagram: true,
+  },
+  {
+    id: 'ano-novo',
+    title: 'Tiragem de Fim de Ano',
+    text: 'Tenha uma visão geral do seu ano de {ano}. Agende a tiragem de ano novo.',
+    cta: 'Agendar tiragem',
+    message: 'Olá, gostaria de agendar a tiragem de ano novo',
+  },
+];

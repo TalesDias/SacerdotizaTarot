@@ -57,9 +57,47 @@ follow.
 ## Interactivity
 
 The page ships **no JavaScript bundle**. The reading cards expand on hover in pure
-CSS, the FAQ is native `<details name="faq">`, and the only script is ~15 inline
-lines driving the promo `<dialog>`. Every price, description and FAQ answer is in
-the served HTML, so it is all indexable with scripting off.
+CSS, the FAQ is native `<details name="faq">`, and the inline scripts drive the
+promo `<dialog>`, the portrait flip and the phone package carousel. Every price,
+description and FAQ answer is in the served HTML, so it is all indexable with
+scripting off.
+
+## Promo dialogs
+
+Three of them, in `PROMOS` in `src/data/content.ts`, listed highest priority
+first. At most one is ever shown — the first whose window is open. Windows are
+read off **Brazil's clock** (`America/Sao_Paulo`), since the offers run on São
+Paulo time, and live in `PromoDialog.astro`:
+
+| Promo | Window | Priority |
+|---|---|---|
+| Dia dos Namorados | 6–12 June, the 12th included | highest |
+| Caixinha do Tarot | Friday 09:00 → Saturday 09:00, weekly | middle |
+| Tiragem de Fim de Ano | 1 December → 31 January | lowest |
+
+Closing one stores its **occasion** (`sac-promo-<id>` in localStorage: a Friday's
+date, or a year), so a dismissal silences that Friday or that June, not every one
+after. Dismissals are per promo, so closing the year-end one still leaves Friday's
+Caixinha free to appear. The dialog is desktop-only — a full-screen interstitial
+on mobile is the pattern Google penalises.
+
+### Previewing them
+
+Two query parameters, safe to leave in production since neither shows anything a
+visitor could not see by waiting for the date:
+
+```
+?promo=namorados          force a dialog open, ignoring date, dismissal and the
+?promo=caixinha           desktop-only rule — closing it stores nothing
+?promo=ano-novo
+
+?now=2026-06-12T23:59:00-03:00     run the real schedule against a made-up clock
+?now=2026-12-04T13:00:00-03:00     (this one lands on a Friday in December, so
+                                    Caixinha outranks the year-end promo)
+```
+
+`?now=` drives the actual window logic, so it is the one that proves the
+schedule. Clear a dismissal with `localStorage.clear()` in the console.
 
 ## Card art
 

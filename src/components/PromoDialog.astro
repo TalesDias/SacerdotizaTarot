@@ -1,95 +1,146 @@
 ---
-import { PROMO_TEXT_PREFIX, PROMO_PRICE, PROMO_TEXT_SUFFIX } from '../data/content';
-import { INSTAGRAM_HANDLE, INSTAGRAM_URL } from '../data/site';
+import { PROMOS } from '../data/content';
+import { INSTAGRAM_URL, waLink } from '../data/site';
 import SparkleIcon from './icons/SparkleIcon.astro';
+
+// The year-end promo names the year its season looks ahead to. This is only the
+// value at build time — the script rewrites it from the visitor's clock, which
+// is what keeps a site built in one year correct in the next.
+const year = new Date().getFullYear() + 1;
 ---
 
-<dialog id="promo" aria-labelledby="promo-title">
-  <div class="head">
-    <p id="promo-title" class="title">Promoção</p>
-    <SparkleIcon />
-  </div>
+{
+  PROMOS.map((promo) => (
+    <dialog data-promo={promo.id} aria-labelledby={`promo-${promo.id}`}>
+      <div class="head">
+        <p id={`promo-${promo.id}`} class="title">
+          {promo.title}
+        </p>
+        <SparkleIcon />
+      </div>
 
-  <p class="pitch">
-    {PROMO_TEXT_PREFIX}<b>{PROMO_PRICE}</b>{PROMO_TEXT_SUFFIX}<b>{INSTAGRAM_HANDLE}</b>.
-  </p>
+      <p class="pitch" set:html={promo.text.replace('{ano}', `<b data-year>${year}</b>`)} />
 
-  <div class="actions">
-    <button type="button" class="btn btn-ghost" data-close>Fechar</button>
-    <a class="btn btn-solid" href={INSTAGRAM_URL} target="_blank" rel="noopener" data-close>
-      Ir para o Instagram
-    </a>
-  </div>
-</dialog>
+      <div class="actions">
+        <button type="button" class="btn btn-ghost" data-close>
+          Fechar
+        </button>
+        <a
+          class="btn btn-solid"
+          href={promo.instagram ? INSTAGRAM_URL : waLink(promo.message)}
+          target="_blank"
+          rel="noopener"
+          data-close
+        >
+          {promo.cta}
+        </a>
+      </div>
+    </dialog>
+  ))
+}
 
 <script>
-  const dialog = document.getElementById('promo') as HTMLDialogElement | null;
-  const KEY = 'sac-promo-seen';
-  // Friday 09:00 to Saturday 09:00.
-  const OPENS = 9;
+  const dialogs = [...document.querySelectorAll<HTMLDialogElement>('[data-promo]')];
 
-  if (dialog) {
-    // Which window we are in, as the date of its Friday — '' outside one. Read
-    // on Brazil's clock, not the visitor's: the promo runs in Yara's stories,
-    // so someone reading from Lisbon should see it while it is actually live.
-    const promoWeek = () => {
-      const parts = new Intl.DateTimeFormat('en-GB', {
-        timeZone: 'America/Sao_Paulo',
-        weekday: 'short',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        hourCycle: 'h23',
-      }).formatToParts(new Date());
-      const at = (type: Intl.DateTimeFormatPartTypes) =>
-        parts.find((part) => part.type === type)?.value ?? '';
+  if (dialogs.length) {
+    // ?promo=<id> forces one open, ?now=<ISO date> moves the clock. Both are
+    // there so the schedule can be checked in a browser without touching the
+    // machine's clock; neither shows a visitor anything they could not see by
+    // waiting for the date.
+    const params = new URLSearchParams(location.search);
+    const preview = params.get('promo');
 
-      const day = at('weekday');
-      const hour = +at('hour');
-      const saturday = day === 'Sat' && hour < OPENS;
-      if (!saturday && !(day === 'Fri' && hour >= OPENS)) return '';
+    // Brazil's clock, not the visitor's: the offers run on São Paulo time, so
+    // someone reading from elsewhere should see them while they are live.
+    const parts = new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'America/Sao_Paulo',
+      weekday: 'short',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      hourCycle: 'h23',
+    }).formatToParts(new Date(params.get('now') ?? Date.now()));
 
-      // Saturday morning still belongs to Friday's window, so both halves store
-      // and compare the same key and one dismissal covers the whole 24 hours.
-      return new Date(Date.UTC(+at('year'), +at('month') - 1, +at('day') - (saturday ? 1 : 0)))
-        .toISOString()
-        .slice(0, 10);
+    const at = (type: Intl.DateTimeFormatPartTypes) =>
+      parts.find((part) => part.type === type)?.value ?? '';
+    const weekday = at('weekday');
+    const year = +at('year');
+    const month = +at('month');
+    const day = +at('day');
+    const hour = +at('hour');
+
+    // Each window returns an id for the occasion it is inside, or '' when shut.
+    // Dismissals are stored against that id, so closing a promo silences this
+    // Friday, or this June — not every one after it.
+    const windows: Record<string, () => string> = {
+      // Friday 09:00 to Saturday 09:00, weekly.
+      caixinha: () => {
+        const morningAfter = weekday === 'Sat' && hour < 9;
+        if (!morningAfter && !(weekday === 'Fri' && hour >= 9)) return '';
+        // Saturday morning still belongs to Friday's window, so both halves
+        // answer with the same date and one dismissal covers all 24 hours.
+        return new Date(Date.UTC(year, month - 1, day - (morningAfter ? 1 : 0)))
+          .toISOString()
+          .slice(0, 10);
+      },
+
+      // 6 to 12 June, the 12th included: Dia dos Namorados is the 12th, so a
+      // promotion for it that stopped the day before would miss the point.
+      namorados: () => (month === 6 && day >= 6 && day <= 12 ? String(year) : ''),
+
+      // 1 December to 31 January. Named for the year it looks ahead to, which
+      // is the year the copy needs as well.
+      'ano-novo': () => (month === 12 ? String(year + 1) : month === 1 ? String(year) : ''),
     };
 
-    let week = '';
-    try {
-      week = promoWeek();
-    } catch {
-      /* no Intl time zones — leave it closed rather than show it off-schedule */
-    }
+    let dialog: HTMLDialogElement | null = null;
+    let occasion = '';
 
-    const dismiss = () => {
-      try {
-        // Keyed to the window, so closing it this Friday does not silence it
-        // every Friday after.
-        localStorage.setItem(KEY, week);
-      } catch {
-        /* private mode — just close */
+    // Document order is priority order — PROMOS lists them highest first.
+    for (const el of dialogs) {
+      const open = windows[el.dataset.promo ?? '']?.() ?? '';
+      if (open) {
+        dialog = el;
+        occasion = open;
+        break;
       }
-      dialog.close();
-    };
-
-    dialog.querySelectorAll('[data-close]').forEach((el) => el.addEventListener('click', dismiss));
-    dialog.addEventListener('close', dismiss);
-
-    let seen = false;
-    try {
-      seen = localStorage.getItem(KEY) === week;
-    } catch {
-      /* treat as unseen */
     }
 
-    // Desktop only: a crawler arrives with empty localStorage every time, and a
-    // full-screen interstitial on mobile is the pattern Google penalises.
-    const roomy = window.matchMedia('(min-width: 768px)').matches;
+    if (preview) dialog = dialogs.find((el) => el.dataset.promo === preview) ?? null;
 
-    if (week && !seen && roomy) setTimeout(() => dialog.showModal(), 900);
+    if (dialog) {
+      const key = `sac-promo-${dialog.dataset.promo}`;
+      const yearTag = dialog.querySelector('[data-year]');
+      if (yearTag) yearTag.textContent = occasion || String(year + 1);
+
+      const dismiss = () => {
+        try {
+          // A preview is not a real sighting, so it must not silence the promo
+          // for whoever is testing it.
+          if (!preview) localStorage.setItem(key, occasion);
+        } catch {
+          /* private mode — just close */
+        }
+        dialog.close();
+      };
+
+      dialog.querySelectorAll('[data-close]').forEach((el) => el.addEventListener('click', dismiss));
+      dialog.addEventListener('close', dismiss);
+
+      let seen = false;
+      try {
+        seen = localStorage.getItem(key) === occasion;
+      } catch {
+        /* treat as unseen */
+      }
+
+      // Desktop only: a crawler arrives with empty localStorage every time, and
+      // a full-screen interstitial on mobile is the pattern Google penalises.
+      const roomy = window.matchMedia('(min-width: 768px)').matches;
+
+      if (preview || (!seen && roomy)) setTimeout(() => dialog.showModal(), 900);
+    }
   }
 </script>
 
@@ -127,8 +178,14 @@ import SparkleIcon from './icons/SparkleIcon.astro';
   .title {
     margin: 0;
     font-family: var(--font-serif);
-    font-size: 40px;
-    line-height: 1;
+    /* "Tiragem de Fim de Ano" is more than twice the length of "Promoção",
+       which the 40px of the canvas was sized for. */
+    font-size: clamp(28px, 7vw, 40px);
+    line-height: 1.1;
+    /* Centred to match the pitch below — only visible now that a title can run
+       to two lines. */
+    text-align: center;
+    text-wrap: balance;
     color: var(--clay);
   }
 
