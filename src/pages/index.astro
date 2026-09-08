@@ -72,12 +72,12 @@ const portraitImg = await getImage({ src: portrait, format: 'webp', width: 520 }
     display: grid;
     justify-items: center;
     /*
-     * Generous, because the brand line wraps to two lines on a phone and the
-     * chip must not read as a third one. The bottom padding matches the left
-     * inset instead of the section rhythm: the chip sits in the page's corner,
-     * so the two edges it hangs off should be the same distance away.
+     * Wide enough that the chip is plainly its own thing and not a third line
+     * under a brand that wraps to two on a phone. The bottom padding matches
+     * the left inset instead of the section rhythm: the chip sits in the
+     * page's corner, so the two edges it hangs off are the same distance away.
      */
-    gap: 46px;
+    gap: 138px;
     margin-top: 16px;
     padding: 0 24px 24px;
     text-align: center;
@@ -147,6 +147,17 @@ const portraitImg = await getImage({ src: portrait, format: 'webp', width: 520 }
     color: inherit;
     text-decoration: underline;
     text-underline-offset: 3px;
+  }
+
+  /*
+   * A corner badge needs a corner to sit in. On a phone the gutters are too
+   * narrow for the offset to read as deliberate, so it centres under the
+   * brand instead.
+   */
+  @media (max-width: 759px) {
+    .credit {
+      justify-self: center;
+    }
   }
 
 </style>
