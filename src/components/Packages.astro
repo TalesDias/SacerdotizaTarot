@@ -15,7 +15,7 @@ import PackageCard from './PackageCard.astro';
   </div>
 
   <div class="row" data-pkg-row>
-    {PACKAGES.map((pkg) => <div class="slot"><PackageCard pkg={pkg} /></div>)}
+    {PACKAGES.map((pkg, i) => <div class="slot" data-i={i}><PackageCard pkg={pkg} /></div>)}
   </div>
 
   <div class="dots" data-pkg-dots>
@@ -69,6 +69,12 @@ import PackageCard from './PackageCard.astro';
     max-width: 360px;
   }
 
+  /* Wrap-around spares, added by the script. They exist only for the phone
+     strip; the grid and the arc show the five real cards. */
+  .slot.clone {
+    display: none;
+  }
+
   /*
    * Phones: one card at a time, swiped. Five stacked cards made the section a
    * long scroll on its own, and the arc below needs width the phone has not
@@ -84,7 +90,6 @@ import PackageCard from './PackageCard.astro';
       gap: 14px;
       overflow-x: auto;
       scroll-snap-type: x mandatory;
-      scroll-padding-inline: 24px;
       /* Keeps a swipe past the last card from triggering back-navigation. */
       overscroll-behavior-x: contain;
       scrollbar-width: none;
@@ -100,22 +105,32 @@ import PackageCard from './PackageCard.astro';
     }
 
     .slot {
-      /* Never a full card width, so the next one always peeks and the strip
-         reads as swipeable without a hint under it. */
+      /* Never a full card width, so a slice of the card either side always
+         shows and the strip reads as swipeable without a hint under it. */
       flex: 0 0 78%;
       min-width: 0;
       max-width: none;
-      scroll-snap-align: start;
+      /* Centred, so the two slices are the same width. Aligning to the start
+         left a 10px sliver behind and a 62px one ahead, which read as the next
+         card being nearer than the last. */
+      scroll-snap-align: center;
+      /* One card per flick — so a fast swipe can never outrun the spares at
+         the ends of the strip. */
+      scroll-snap-stop: always;
     }
 
-    /* Safari drops a horizontal scroller's trailing padding, so the end gutter
-       is a margin on the last card instead. */
+    .slot.clone {
+      display: flex;
+    }
+
+    /* Half the leftover width, so the first and last cards can still reach the
+       middle. Only reachable with the script off; the loop never gets here. */
     .slot:first-child {
-      margin-left: 24px;
+      margin-left: 11%;
     }
 
     .slot:last-child {
-      margin-right: 24px;
+      margin-right: 11%;
     }
 
     .dots[data-ready] {
@@ -147,13 +162,15 @@ import PackageCard from './PackageCard.astro';
       transition: margin-top 0.3s ease;
     }
 
-    .slot:nth-child(1),
-    .slot:nth-child(5) {
+    /* Indexed rather than nth-child: the carousel clones extra slots into the
+       row, which would shift every positional selector. */
+    .slot[data-i='0'],
+    .slot[data-i='4'] {
       margin-top: 240px;
     }
 
-    .slot:nth-child(2),
-    .slot:nth-child(4) {
+    .slot[data-i='1'],
+    .slot[data-i='3'] {
       margin-top: 120px;
     }
   }
@@ -214,35 +231,90 @@ import PackageCard from './PackageCard.astro';
   const dots = document.querySelector<HTMLElement>('[data-pkg-dots]');
 
   if (row && dots) {
-    const slots = [...row.children];
+    const real = [...row.children] as HTMLElement[];
     const buttons = [...dots.children] as HTMLButtonElement[];
+    const count = real.length;
+    // Spare copies at both ends, so the strip always has a card waiting in the
+    // direction you are swiping and can be rewound a whole set at a time.
+    const lead = 2;
 
-    dots.dataset.ready = '';
+    const spare = (card: HTMLElement) => {
+      const copy = card.cloneNode(true) as HTMLElement;
+      copy.classList.add('clone');
+      // The original is already in the accessibility tree and in the HTML the
+      // crawler is served; these are scenery.
+      copy.setAttribute('aria-hidden', 'true');
+      return copy;
+    };
 
-    buttons.forEach((button, i) => {
+    row.prepend(...real.slice(count - lead).map(spare));
+    row.append(...real.slice(0, lead).map(spare));
+
+    const items = [...row.children] as HTMLElement[];
+    const mid = (el: HTMLElement) => el.offsetLeft + el.offsetWidth / 2;
+    const eye = () => row.scrollLeft + row.clientWidth / 2;
+    const closest = (candidates: number[]) =>
+      candidates.reduce((a, b) => (Math.abs(mid(items[b]) - eye()) < Math.abs(mid(items[a]) - eye()) ? b : a));
+
+    const nearest = () => closest(items.map((_, i) => i));
+
+    let current = 0;
+    const paint = () => {
+      current = (((nearest() - lead) % count) + count) % count;
+      buttons.forEach((b, j) => b.setAttribute('aria-current', String(j === current)));
+    };
+
+    const centre = (i: number) => mid(items[i]) - row.clientWidth / 2;
+
+    // Once the strip settles on a spare, slide to the real card showing the
+    // same thing. Both positions are pixel-identical, so nothing is seen to
+    // move — that jump is what makes the loop endless.
+    const rewind = () => {
+      const i = nearest();
+      if (i < lead) row.scrollLeft += mid(items[i + count]) - mid(items[i]);
+      else if (i >= lead + count) row.scrollLeft -= mid(items[i]) - mid(items[i - count]);
+    };
+
+    let idle = 0;
+    let dragging = false;
+    // Never rewind under a finger: moving the scroller mid-drag makes the
+    // browser recompute the gesture from the new offset and the card snaps back.
+    const settle = () => {
+      clearTimeout(idle);
+      idle = window.setTimeout(() => {
+        if (!dragging) rewind();
+      }, 140);
+    };
+
+    row.addEventListener('scroll', () => { paint(); settle(); }, { passive: true });
+    row.addEventListener('touchstart', () => { dragging = true; }, { passive: true });
+    row.addEventListener('touchend', () => { dragging = false; settle(); }, { passive: true });
+
+    buttons.forEach((button, n) => {
       button.addEventListener('click', () => {
-        slots[i].scrollIntoView({
+        // Whichever copy of that card is nearest, so the dots wrap the short
+        // way round instead of rewinding the whole strip.
+        const to = closest([lead + n - count, lead + n, lead + n + count].filter((i) => i >= 0 && i < items.length));
+        row.scrollTo({
+          left: centre(to),
           behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
-          block: 'nearest',
-          inline: 'start',
         });
       });
     });
 
-    // A card is "current" once it fills 80% of the strip. Cards are 78% of the
-    // scrollport, so two can never clear that bar at once and exactly one dot
-    // is ever marked, mid-swipe included.
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
-          const current = slots.indexOf(entry.target);
-          buttons.forEach((button, i) => button.setAttribute('aria-current', String(i === current)));
-        }
-      },
-      { root: row, threshold: 0.8 },
-    );
+    // A rotation changes every card's width, so the strip would re-snap to
+    // whichever card happened to fall nearest the middle. Put it back on the
+    // one that was being read.
+    let resized = 0;
+    addEventListener('resize', () => {
+      clearTimeout(resized);
+      resized = window.setTimeout(() => {
+        row.scrollLeft = centre(lead + current);
+      }, 150);
+    });
 
-    slots.forEach((slot) => observer.observe(slot));
+    row.scrollLeft = centre(lead);
+    paint();
+    dots.dataset.ready = '';
   }
 </script>
