@@ -231,6 +231,19 @@ export interface Package {
 
 export const PACKAGES: Package[] = [
   {
+    name: 'Pacote mensal',
+    accent: '#8ed07a',
+    bullet: '#8ed07a',
+    badge: 'assinatura',
+    description:
+      'Todo início de mês (no dia combinado) te enviarei uma análise de 4/5 áreas de sua vida (a sua escolha) + um conselho.',
+    price: 45,
+    priceLabel: 'R$ 45',
+    priceSuffix: ',00 mensais',
+    footnote: '5 reais de desconto no primeiro mês.',
+    recurring: true,
+  },
+  {
     name: 'Pacote do amor para solteiros',
     accent: '#c79ae8',
     bullet: '#c79ae8',
@@ -265,19 +278,6 @@ export const PACKAGES: Package[] = [
     price: 65,
     priceLabel: 'R$ 65',
     priceSuffix: ',00',
-  },
-  {
-    name: 'Pacote mensal',
-    accent: '#8ed07a',
-    bullet: '#8ed07a',
-    badge: 'assinatura',
-    description:
-      'Todo início de mês (no dia combinado) te enviarei uma análise de 4/5 áreas de sua vida (a sua escolha) + um conselho.',
-    price: 45,
-    priceLabel: 'R$ 45',
-    priceSuffix: ',00 mensais',
-    footnote: '5 reais de desconto no primeiro mês.',
-    recurring: true,
   },
 ];
 
