@@ -73,7 +73,7 @@ export const READING_GROUPS: ReadingGroup[] = [
         tag: 'Solteiros',
         price: 45,
         priceLabel: 'R$ 45,00',
-        text: 'O caminho afetivo que se abre nos próximos meses: sinais, encontros e o tempo certo.',
+        text: 'Analisaremos o que te aguarda no futuro de sua vida amorosa: algum dia você encontrará seu verdadeiro amor? Será feliz com essa pessooa? O casamento é algo que esta no seu futuro? Este amor verdadeiro será parecido com amores que já passaram pela sua vida? Entre outras reflexões.',
       },
     ],
   },
@@ -227,6 +227,8 @@ export interface Package {
   footnote?: string;
   /** Set for the monthly subscription so structured data can mark it recurring. */
   recurring?: boolean;
+  /** Takes the peak of the desktop arc, wherever it sits in this list. */
+  featured?: boolean;
 }
 
 export const PACKAGES: Package[] = [
@@ -242,6 +244,7 @@ export const PACKAGES: Package[] = [
     priceSuffix: ',00 mensais',
     footnote: '5 reais de desconto no primeiro mês.',
     recurring: true,
+    featured: true,
   },
   {
     name: 'Pacote do amor para solteiros',

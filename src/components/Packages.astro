@@ -2,6 +2,22 @@
 import { PACKAGES } from '../data/content';
 import { waLink } from '../data/site';
 import PackageCard from './PackageCard.astro';
+
+// The arc peaks at its middle slot, so the featured package has to be placed
+// there rather than wherever it sits in the list. Everything else keeps its
+// relative order and fans out around it. DOM order is left alone — it is what
+// the phone carousel, the crawler and a screen reader all read.
+const peak = Math.floor(PACKAGES.length / 2);
+const featured = PACKAGES.findIndex((pkg) => pkg.featured);
+const centre = featured === -1 ? peak : featured;
+
+const arc: number[] = [];
+arc[centre] = peak;
+PACKAGES.map((_, i) => i)
+  .filter((i) => i !== centre)
+  .forEach((i, slot) => {
+    arc[i] = slot < peak ? slot : slot + 1;
+  });
 ---
 
 <section id="pacotes" class="section">
@@ -15,7 +31,13 @@ import PackageCard from './PackageCard.astro';
   </div>
 
   <div class="row" data-pkg-row>
-    {PACKAGES.map((pkg, i) => <div class="slot" data-i={i}><PackageCard pkg={pkg} /></div>)}
+    {
+      PACKAGES.map((pkg, i) => (
+        <div class="slot" data-arc={arc[i]} style={`--arc:${arc[i]}`}>
+          <PackageCard pkg={pkg} />
+        </div>
+      ))
+    }
   </div>
 
   <div class="dots" data-pkg-dots>
@@ -162,15 +184,19 @@ import PackageCard from './PackageCard.astro';
       transition: margin-top 0.3s ease;
     }
 
-    /* Indexed rather than nth-child: the carousel clones extra slots into the
-       row, which would shift every positional selector. */
-    .slot[data-i='0'],
-    .slot[data-i='4'] {
+    /* Laid out by arc slot, not by document position: the featured package
+       takes the peak, and the carousel clones would shift any nth-child. */
+    .slot {
+      order: var(--arc);
+    }
+
+    .slot[data-arc='0'],
+    .slot[data-arc='4'] {
       margin-top: 240px;
     }
 
-    .slot[data-i='1'],
-    .slot[data-i='3'] {
+    .slot[data-arc='1'],
+    .slot[data-arc='3'] {
       margin-top: 120px;
     }
   }
