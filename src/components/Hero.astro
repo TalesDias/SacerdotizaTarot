@@ -2,6 +2,7 @@
 import { Picture } from 'astro:assets';
 import portrait from '../assets/yara.webp';
 import priestess from '../assets/yara-priestess.webp';
+import cacau from '../assets/cats/cacau.png';
 import { BIO } from '../data/content';
 import { SITE_NAME, TAGLINE, TAROLOGA, INSTAGRAM_URL, waLink } from '../data/site';
 ---
@@ -20,7 +21,7 @@ import { SITE_NAME, TAGLINE, TAROLOGA, INSTAGRAM_URL, waLink } from '../data/sit
             src={portrait}
             alt={`${TAROLOGA}, taróloga e mestre de baralho cigano`}
             widths={[260, 520, 780]}
-            sizes="min(260px, 58vw)"
+            sizes="min(284px, 55vw)"
             formats={['avif']}
             fallbackFormat="webp"
             loading="eager"
@@ -33,7 +34,7 @@ import { SITE_NAME, TAGLINE, TAROLOGA, INSTAGRAM_URL, waLink } from '../data/sit
             src={priestess}
             alt=""
             widths={[260, 520, 780]}
-            sizes="min(260px, 58vw)"
+            sizes="min(284px, 55vw)"
             formats={['avif']}
             fallbackFormat="webp"
             loading="eager"
@@ -41,6 +42,16 @@ import { SITE_NAME, TAGLINE, TAROLOGA, INSTAGRAM_URL, waLink } from '../data/sit
           />
         </div>
       </div>
+      <Picture
+        src={cacau}
+        alt=""
+        widths={[350, 700]}
+        sizes="min(350px, 78vw)"
+        formats={['avif']}
+        fallbackFormat="webp"
+        loading="eager"
+        class="cacau"
+      />
     </div>
     <p class="bio">{BIO}</p>
   </div>
@@ -133,29 +144,100 @@ import { SITE_NAME, TAGLINE, TAROLOGA, INSTAGRAM_URL, waLink } from '../data/sit
    * with the portrait. It only supplies the perspective its child turns in.
    */
   .portrait-ring {
+    /*
+     * The whole circle — photo plus its 3px rim. 284px is what it was when the
+     * rim was 24px wide, so desktop is unchanged; the vw term is the only knob
+     * a phone sees, and lowering it is how Cacau gets room to sit.
+     */
+    --disc: min(284px, 55vw);
+
     position: relative;
     flex: 0 0 auto;
-    width: calc(min(260px, 58vw) + 24px);
-    height: calc(min(260px, 58vw) + 24px);
+    width: var(--disc);
+    height: var(--disc);
     border-radius: 50%;
     background: var(--surface);
     box-shadow: 0 14px 40px rgba(123, 106, 94, 0.14);
     perspective: 1000px;
   }
 
-  /* Inset by the rim width, so only the imagery spins inside the white disc. */
+  /*
+   * Room for Cacau's ears, which sit above the circle and would otherwise
+   * land on the tagline.
+   *
+   * A flat 20px is only enough while the circle is small. --disc reaches its
+   * 284px ceiling at 516px wide, but the hero stays a single centred column
+   * until about 680px — so through that whole band she is at full size and
+   * still directly under the tagline. Measured overlap there is 4px; the
+   * clamp gives 12px more room at the top of the range and leaves the
+   * narrow-phone composition where it was.
+   */
+  @media (max-width: 819px) {
+    .portrait-ring {
+      margin-top: clamp(20px, 6.2vw, 32px);
+    }
+  }
+
+  /* Fills the ring: the white rim is now the 3px the slots leave, not a band
+     of disc showing around them. The ring keeps its size, so nothing in the
+     hero shifts — the portrait just grows into the space the rim gave up. */
   .portrait-coin {
     position: absolute;
-    inset: 12px;
+    inset: 0;
     transform-style: preserve-3d;
     transition: transform 0.95s cubic-bezier(0.45, 0.05, 0.35, 1);
   }
+
+  /*
+   * Draped over the top of the coin and, deliberately, outside it: a child of
+   * the ring, so the flip turns the portrait underneath her while she stays
+   * put. Purely decorative, hence the empty alt and no pointer target.
+   *
+   * Three numbers place her, and only these three:
+   *
+   *   --cat-size   her width, as a % of the portrait ring. Over 100% on
+   *                purpose — she hangs off both sides of the circle.
+   *   --cat-ride   how high she sits. Higher % lifts her off the photo;
+   *                lower % sinks her further down over it. At 100% her tail
+   *                tip would just touch the top of the circle.
+   *   --cat-nudge  sideways. -50% is centred; toward -60% moves her left,
+   *                toward -40% moves her right.
+   *
+   * The phone values are in the media query below — change both.
+   */
+  .cacau {
+    --cat-size: 101%;
+    --cat-ride: 55%;
+    --cat-nudge: -64%;
+
+    position: absolute;
+    left: 50%;
+    bottom: var(--cat-ride);
+    z-index: 2;
+    width: var(--cat-size);
+    /* Opts out of the global img { max-width: 100% }, which would clamp her
+       back to the ring's width the moment --cat-size goes over 100%. */
+    max-width: none;
+    height: auto;
+    transform: translateX(var(--cat-nudge));
+    pointer-events: none;
+  }
+
+  /* On a phone the tagline sits directly above a centred portrait, and at the
+     desktop proportions her ears reach into it. Smaller, and lower. */
+  @media (max-width: 759px) {
+    .cacau {
+      --cat-size: 100%;
+      --cat-ride: 56%;
+    }
+  }
+
 
   /* Two faces of the same disc. The back one is pre-turned, so every 180deg
      of the parent swaps which one points at the viewer — no class toggling. */
   .slot {
     position: absolute;
-    inset: 12px;
+    inset: 3px;
     backface-visibility: hidden;
   }
 

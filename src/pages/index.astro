@@ -1,5 +1,5 @@
 ---
-import { getImage } from 'astro:assets';
+import { getImage, Picture } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import Backdrop from '../components/Backdrop.astro';
 import Hero from '../components/Hero.astro';
@@ -10,6 +10,7 @@ import Packages from '../components/Packages.astro';
 import Faq from '../components/Faq.astro';
 import PromoDialog from '../components/PromoDialog.astro';
 import portrait from '../assets/yara.webp';
+import shoyu from '../assets/cats/shoyu.png';
 import GitHubIcon from '../components/icons/GitHubIcon.astro';
 import {
   SITE_NAME,
@@ -30,13 +31,25 @@ const portraitImg = await getImage({ src: portrait, format: 'webp', width: 520 }
 
     <main>
       <Spreads />
-      <Divider />
+      <Divider perch="amarula" />
       <Questions />
       <Divider />
       <Packages />
-      <Divider />
+      <Divider perch="pacoca" />
       <Faq />
     </main>
+
+    <div class="companion">
+      <Picture
+        src={shoyu}
+        alt=""
+        widths={[240, 480, 661]}
+        sizes="240px"
+        formats={['avif']}
+        fallbackFormat="webp"
+        loading="lazy"
+      />
+    </div>
 
     <footer>
       <p class="brand">
@@ -64,6 +77,27 @@ const portraitImg = await getImage({ src: portrait, format: 'webp', width: 520 }
   main {
     position: relative;
     z-index: 1;
+  }
+
+  /* Shoyu sees the page out, sitting between the last word of the FAQ and the
+     brand line. Decorative, so he carries no alt text and no landmark. */
+  .companion {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    /* The FAQ's 56px of bottom padding and the footer's 16px do not centre him
+       between the two lines on their own; this splits the difference without
+       changing how tall the block is. */
+    margin-top: -17px;
+    /* Padding, not margin: a bottom margin here would collapse into the
+       footer's own and the space would not appear. */
+    padding-bottom: 16px;
+  }
+
+  .companion :global(img) {
+    width: auto;
+    height: 175px;
   }
 
   footer {

@@ -1,12 +1,43 @@
 ---
 /** Rule–dot–dot–dot–rule separator, used three times down the page. */
+import { Picture } from 'astro:assets';
+import amarula from '../assets/cats/amarula.png';
+import pacoca from '../assets/cats/pacoca.png';
+
+/** Which cat sits on the rule, and which end it sits at. */
+const CATS = {
+  amarula: { src: amarula, side: 'right' },
+  pacoca: { src: pacoca, side: 'left' },
+} as const;
+
+interface Props {
+  /** Seats a cat on the rule. Two of the three dividers have one. */
+  perch?: keyof typeof CATS;
+}
+
+const { perch } = Astro.props;
+const cat = perch ? CATS[perch] : null;
 ---
-<div class="divider" aria-hidden="true">
+<div class:list={['divider', { perch: cat }]} aria-hidden="true">
   <span class="line"></span>
   <span class="dot" style="background:var(--accent-1)"></span>
   <span class="dot" style="background:var(--accent-2)"></span>
   <span class="dot" style="background:var(--accent-3)"></span>
   <span class="line"></span>
+  {
+    cat && (
+      <Picture
+        src={cat.src}
+        alt=""
+        widths={[175, 350, 525]}
+        sizes="175px"
+        formats={['avif']}
+        fallbackFormat="webp"
+        loading="lazy"
+        class:list={['cat', cat.side]}
+      />
+    )
+  }
 </div>
 
 <style>
@@ -32,4 +63,58 @@
     height: 9px;
     border-radius: 50%;
   }
+
+  /*
+   * The section above ends 56px up and this rule adds 56 more: 112px of air,
+   * where she needs 160. The bump is the smallest that clears her ears.
+   */
+  .perch {
+    margin-top: 120px;
+  }
+
+  /* Her feet land on the rule's lower edge, so she stands on it rather than
+     hovering a hair above. The rule is centred in a 9px-tall row of dots. */
+  .cat {
+    position: absolute;
+    bottom: calc(50% - 5px);
+    width: auto;
+    height: 170px;
+    pointer-events: none;
+  }
+
+  /* Amarula faces left and Paçoca faces right, so each one looks back into
+     the page from the end she or he sits at. */
+  .cat.right {
+    right: 20px;
+  }
+
+  .cat.left {
+    left: 20px;
+  }
+
+  @media (max-width: 759px) {
+    .cat {
+      height: 150px;
+    }
+
+    /*
+     * Below 375px Amarula's tail reaches back over the last dot. The cap only
+     * bites under that width — 40vw is exactly 150px at 375 — so the phone
+     * sizes above it are untouched.
+     */
+    .cat.right {
+      height: min(150px, 40vw);
+    }
+
+    /*
+     * Paçoca is wider than he is tall, and on the left the dots come to meet
+     * him: the narrower the screen, the less room between the gutter and the
+     * first one. At a flat 150px his paw covers them below ~420px. Tying him
+     * to the viewport keeps the paw short of the dots at every width.
+     */
+    .cat.left {
+      height: min(150px, 32vw);
+    }
+  }
+
 </style>
