@@ -11,9 +11,11 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# environment
-.env
-.env.production
+# environment — every .env variant, so a .env.local or .env.staging added later
+# is covered without anyone having to remember to add it here. The template is
+# the one exception, and carries no values.
+.env*
+!.env.example
 
 # editors / OS
 .DS_Store
