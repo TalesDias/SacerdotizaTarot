@@ -1,0 +1,146 @@
+---
+import { Picture } from 'astro:assets';
+import priestess from '../assets/tarot/Major_Arcana_webp/02-high-priestess.webp';
+import { PRIESTESS_TITLE, PRIESTESS_TEXT } from '../data/content';
+---
+
+<section id="sacerdotisa" class="section">
+  <article class="card">
+    <span class="topbar"></span>
+    <h2>{PRIESTESS_TITLE}</h2>
+    <div class="prose">
+      {PRIESTESS_TEXT.map((para) => <p>{para}</p>)}
+    </div>
+    <div class="art">
+      <Picture
+        src={priestess}
+        alt="A Sacerdotisa, o segundo Arcano Maior, no baralho Rider-Waite-Smith"
+        widths={[210, 420]}
+        sizes="min(210px, 30vw)"
+        formats={['avif']}
+        fallbackFormat="webp"
+        loading="lazy"
+        class="deck"
+      />
+    </div>
+  </article>
+</section>
+
+<style>
+  /*
+   * Two columns on a desktop, the card art spanning both rows beside the text.
+   * On a phone the areas re-flow so the art sits next to the heading instead,
+   * with the prose full width underneath.
+   */
+  .card {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'title art'
+      'prose art';
+    align-items: center;
+    column-gap: clamp(24px, 4vw, 48px);
+    padding: 40px;
+    background: var(--surface);
+    border-radius: 16px;
+    /* Clips the bar to the card's rounding, the way the package cards do. */
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+  }
+
+  .topbar {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 8px;
+    background: var(--accent-3);
+  }
+
+  h2 {
+    grid-area: title;
+    align-self: end;
+    margin: 0 0 20px;
+    font-size: 30px;
+    line-height: 1.2;
+    color: var(--clay);
+  }
+
+  .prose {
+    grid-area: prose;
+  }
+
+  .prose p {
+    margin: 0 0 16px;
+    font-size: 15px;
+    line-height: 1.8;
+    color: var(--body);
+    text-wrap: pretty;
+  }
+
+  .prose p:last-child {
+    margin-bottom: 0;
+  }
+
+  /*
+   * The wrapper is what the grid places: <Picture> renders a <picture> around
+   * the <img>, so a grid-area on the image itself would never be read and the
+   * picture would auto-place into the first free cell instead.
+   */
+  .art {
+    grid-area: art;
+    align-self: center;
+    /*
+     * A floor on the space above and below, not a fixed gap. Once the text
+     * column is short enough that the art would otherwise come within 30px of
+     * the card's inner edge, this grows the card instead of letting the art
+     * crowd it. At narrower widths the column is tall and the padding does
+     * nothing.
+     */
+    padding-block: 48px;
+  }
+
+  .deck {
+    display: block;
+    /* Sized so the card reads as sitting in the panel rather than filling it:
+       at the widest layouts it covers about three quarters of the inner
+       height, against 91% at 210px. */
+    width: 180px;
+    height: auto;
+    border-radius: 4px;
+    /* The same off-square tilt the reading cards peek at, so the two pieces of
+       deck art on the page read as one idea. */
+    transform: rotate(-3deg);
+    box-shadow: var(--shadow-lg);
+  }
+
+  @media (max-width: 759px) {
+    .card {
+      grid-template-areas:
+        'title art'
+        'prose prose';
+      column-gap: 18px;
+      padding: 30px 24px 32px;
+    }
+
+    h2 {
+      align-self: center;
+      margin: 0;
+      font-size: 24px;
+      text-wrap: balance;
+    }
+
+    /* Beside the heading the art has the heading's own row to breathe in;
+       the desktop floor would only add dead space above and below it. */
+    .art {
+      padding-block: 0;
+    }
+
+    .prose {
+      margin-top: 22px;
+    }
+
+    .deck {
+      width: clamp(78px, 24vw, 108px);
+    }
+  }
+</style>

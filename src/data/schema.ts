@@ -99,6 +99,26 @@ export function buildGraph({ siteUrl, portraitUrl }: Options) {
         description: SEO_DESCRIPTION,
         inLanguage: 'pt-BR',
         publisher: { '@id': orgId },
+        /*
+         * Not a rich-result feature — Google renders nothing from these. They
+         * name the page's subjects with identifiers other systems already
+         * hold, so the topic is unambiguous rather than inferred from the
+         * prose. `about` is what the site is for; `mentions` is the card the
+         * Sacerdotisa section explains — the site is named after it but is not
+         * about it. Both QIDs checked against Wikidata, not guessed.
+         */
+        about: {
+          '@type': 'Thing',
+          '@id': 'https://www.wikidata.org/wiki/Q583269',
+          name: 'Tarô',
+          sameAs: 'https://pt.wikipedia.org/wiki/Tar%C3%B4',
+        },
+        mentions: {
+          '@type': 'Thing',
+          '@id': 'https://www.wikidata.org/wiki/Q1964135',
+          name: 'A Sacerdotisa',
+          sameAs: 'https://pt.wikipedia.org/wiki/A_Suma_Sacerdotisa',
+        },
       },
       {
         '@type': 'Organization',

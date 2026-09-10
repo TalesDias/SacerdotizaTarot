@@ -7,6 +7,7 @@ import Spreads from '../components/Spreads.astro';
 import Divider from '../components/Divider.astro';
 import Questions from '../components/Questions.astro';
 import Packages from '../components/Packages.astro';
+import Priestess from '../components/Priestess.astro';
 import Faq from '../components/Faq.astro';
 import PromoDialog from '../components/PromoDialog.astro';
 import portrait from '../assets/yara.webp';
@@ -36,6 +37,7 @@ const portraitImg = await getImage({ src: portrait, format: 'webp', width: 520 }
       <Divider />
       <Packages />
       <Divider perch="pacoca" />
+      <Priestess />
       <Faq />
     </main>
 

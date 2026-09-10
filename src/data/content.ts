@@ -390,3 +390,16 @@ export const PROMOS: Promo[] = [
     message: 'Olá, gostaria de agendar a tiragem de ano novo',
   },
 ];
+
+/**
+ * The card the business is named for, explained. Sources are cited inline the
+ * way the copy was written; the quotes use the same typographic marks as the
+ * rest of the page.
+ */
+export const PRIESTESS_TITLE = 'O que significa A Sacerdotisa?';
+
+export const PRIESTESS_TEXT = [
+  'A Sacerdotisa, também chamada de Alta Sacerdotisa ou, no Tarot de Marselha, A Papisa, é o segundo Arcano Maior do Tarot.',
+  'A imagem mostra uma mulher sentada entre duas colunas, uma preta e outra branca, com um véu decorado com romãs atrás dela e um rolo de pergaminho no colo. Segundo Vera Miranda, que reuniu em seu material de curso interpretações de vários autores, essas colunas remetem a Boaz e Jakin, os pilares do templo de Jerusalém, e representam a dualidade entre passividade e ação, entre o oculto e o revelado (MIRANDA, 2013). Hajo Banzhaf explica que a carta “incorpora as forças mediúnicas e intuitivas e simboliza uma sensibilidade extraordinária”, representando a confiança na voz interior e a capacidade de reconhecer os momentos certos (BANZHAF apud MIRANDA, 2013).',
+  'De modo geral, A Sacerdotisa costuma indicar um momento de introspecção, escuta e paciência. Mario Montano reforça que ela representa a arte de “deixar fluir nossas habilidades desconhecidas” e nos convida a confiar no que ainda não pode ser explicado racionalmente (MONTANO apud MIRANDA, 2013).',
+];
