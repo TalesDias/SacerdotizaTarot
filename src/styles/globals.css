@@ -142,6 +142,17 @@ h4 {
   }
 }
 
+/* The phone's promo is a sheet fixed to the bottom edge, so it slides up out
+   of it rather than scaling into the middle the way the desktop card does. */
+@keyframes ssheet {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
